@@ -71,17 +71,24 @@ if st.button("Predict and Visualize"):
         textposition="top center"
     )
     traces.append(user_trace)
+    
+    fig = go.Figure(data=traces, layout=dict(
+        title="3D PCA Cluster Visualization",
+        scene=dict(xaxis_title='PC1', yaxis_title='PC2', zaxis_title='PC3')
+    ))
 
-    # Layout
-    layout = dict(
-        title="Visualizing Clusters in Three Dimensions Using PCA",
-        scene=dict(
-            xaxis=dict(title='PC1'),
-            yaxis=dict(title='PC2'),
-            zaxis=dict(title='PC3')
-        ),
-        margin=dict(l=0, r=0, b=0, t=40)
-    )
+    st.plotly_chart(fig)
 
-    fig = go.Figure(data=traces, layout=layout)
-    st.plotly_chart(fig, use_container_width=True)
+#     # Layout
+#     layout = dict(
+#         title="Visualizing Clusters in Three Dimensions Using PCA",
+#         scene=dict(
+#             xaxis=dict(title='PC1'),
+#             yaxis=dict(title='PC2'),
+#             zaxis=dict(title='PC3')
+#         ),
+#         margin=dict(l=0, r=0, b=0, t=40)
+#     )
+
+#     fig = go.Figure(data=traces, layout=layout)
+#     st.plotly_chart(fig, use_container_width=True)
