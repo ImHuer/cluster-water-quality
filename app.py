@@ -1,36 +1,43 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import streamlit as st
 import joblib
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
 
-# Load models and data
-gmm_model = joblib.load('gmm_model.pkl')
-pca = joblib.load('pca_gmm.pkl')
-df_clusters = joblib.load('gmm_df.pkl')  # includes PC1_3d, PC2_3d, PC3_3d, Cluster
+# Load pipeline
+pipeline = joblib.load('pipeline_inference.pkl')
+df_clusters = joblib.load('gmm_df.pkl')  # for 3D PCA visualization
 
-st.title("Water Quality GMM Clustering + 3D PCA Visualization")
+st.title("Water Quality GMM Clustering")
 
 # User Input
-st.subheader("Enter Water Quality Parameters")
+st.subheader("Enter Water Quality Parameters: ")
+
+water_speed = st.number_input("Average Water Speed")
+water_dir = st.number_input("Average Water Direction")
+chlorophyll = st.number_input("Chlorophyll")
+temp = st.number_input("Temperature")
+do = st.number_input("Dissolved Oxygen")
+do_sat = st.number_input("Dissolved Oxygen (%Saturation)")
 pH = st.number_input("pH", min_value=0.0, max_value=14.0, step=0.1)
-temp = st.number_input("Temperature (°C)", step=0.1)
-turb = st.number_input("Turbidity (NTU)", step=0.1)
-sal = st.number_input("Salinity", step=0.1)
-do = st.number_input("Dissolved Oxygen (mg/L)", step=0.1)
+salinity = st.number_input("Salinity")
+conductance = st.number_input("Specific Conductance")
+turbidity = st.number_input("Turbidity")
+hour = st.number_input("Hour", min_value=0, max_value=23)
+doy = st.number_input("Day of Year", min_value=1, max_value=366)
+month = st.number_input("Month", min_value=1, max_value=12)
+
+input_data = np.array([[
+    water_speed, water_dir, chlorophyll, temp, do,
+    do_sat, pH, salinity, conductance, turbidity,
+    hour, doy, month
+]])
+
 
 if st.button("Predict and Visualize"):
-    input_data = np.array([[pH, temp, turb, sal, do]])
-    cluster = gmm_model.predict(input_data)[0]
-
-    # PCA transform
-    input_pca = pca.transform(input_data)
+    # pipeline already includes scaler + PCA + GMM
+    cluster = pipeline.predict(input_data)[0]
+    input_pca = pipeline.transform(input_data)  # for 3D plot
 
     st.success(f"Predicted Cluster: {cluster}")
 
@@ -78,4 +85,3 @@ if st.button("Predict and Visualize"):
 
     fig = go.Figure(data=traces, layout=layout)
     st.plotly_chart(fig, use_container_width=True)
-
