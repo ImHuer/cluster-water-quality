@@ -90,7 +90,7 @@ if submitted:
     user_input = pd.DataFrame([{
         'Record number': 0,  # dummy value
         'Timestamp': timestamp,
-        'Average Water Speed': avg_water_speed
+        'Average Water Speed': avg_water_speed,
         'Average Water Direction': avg_water_direction,
         'Chlorophyll': chlorophyll,
         'Temperature': temperature,
