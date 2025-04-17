@@ -122,3 +122,72 @@ if submitted:
         st.subheader("📊 Cluster Probabilities")
         for i, p in enumerate(probs):
             st.write(f"Cluster {i}: {p:.2%}")
+
+import plotly.graph_objs as go
+import pandas as pd
+
+# === 3D Visualization Section ===
+st.subheader("🧩 3D Visualization of Clusters (PCA Reduced)")
+
+# Load your PCA + clusters data
+pca_df = pd.read_csv('pca_with_clusters.csv')  # Make sure this file exists!
+
+# Split into clusters
+cluster0 = pca_df[pca_df['cluster'] == 0]
+cluster1 = pca_df[pca_df['cluster'] == 1]
+cluster2 = pca_df[pca_df['cluster'] == 2]
+
+# Build traces with hover info
+trace0 = go.Scatter3d(
+    x=cluster0['PC1_3d'], 
+    y=cluster0['PC2_3d'], 
+    z=cluster0['PC3_3d'],
+    mode='markers',
+    name='Cluster 0',
+    marker=dict(size=5, color='rgba(255, 128, 255, 0.8)'),
+    text=cluster0['hover_info'],  # <-- we'll prepare hover_info column later
+    hoverinfo='text'
+)
+
+trace1 = go.Scatter3d(
+    x=cluster1['PC1_3d'], 
+    y=cluster1['PC2_3d'], 
+    z=cluster1['PC3_3d'],
+    mode='markers',
+    name='Cluster 1',
+    marker=dict(size=5, color='rgba(255, 128, 2, 0.8)'),
+    text=cluster1['hover_info'],
+    hoverinfo='text'
+)
+
+trace2 = go.Scatter3d(
+    x=cluster2['PC1_3d'], 
+    y=cluster2['PC2_3d'], 
+    z=cluster2['PC3_3d'],
+    mode='markers',
+    name='Cluster 2',
+    marker=dict(size=5, color='rgba(0, 255, 200, 0.8)'),
+    text=cluster2['hover_info'],
+    hoverinfo='text'
+)
+
+data = [trace0, trace1, trace2]
+
+layout = go.Layout(
+    title="Visualizing Clusters in 3D (PCA Reduced)",
+    scene=dict(
+        xaxis=dict(title='PC1'),
+        yaxis=dict(title='PC2'),
+        zaxis=dict(title='PC3')
+    ),
+    margin=dict(l=0, r=0, b=0, t=40),
+)
+
+fig = go.Figure(data=data, layout=layout)
+
+# === Animate rotation
+fig.update_layout(scene_camera_eye=dict(x=1.2, y=1.2, z=1.2))
+
+# === Display in Streamlit
+st.plotly_chart(fig, use_container_width=True)
+
