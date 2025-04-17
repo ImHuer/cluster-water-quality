@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import joblib
 from datetime import datetime
-import plotly.express as px
 import plotly.graph_objs as go
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -61,7 +60,7 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
             mask = (z_scores < self.threshold).all(axis=1)
             return X[mask]
 
-# === Load model and pipeline ===
+# === Load Model and Pipeline ===
 pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_model.pkl")
 
@@ -72,16 +71,16 @@ st.markdown("Enter values below to predict the cluster group for water quality c
 # === Form Input ===
 with st.form("input_form"):
     timestamp = st.text_input("Timestamp (YYYY-MM-DD HH:MM:SS)", value=str(datetime.now()))
-    avg_water_speed = st.number_input("Average Water Speed (m/s)", min_value=0.0, step=0.01)
-    avg_water_direction = st.number_input("Average Water Direction (degrees)", min_value=0.0, max_value=360.0, step=0.1)
-    chlorophyll = st.number_input("Chlorophyll", min_value=0.0, step=0.1)
-    temperature = st.number_input("Temperature (°C)", min_value=0.0, step=0.1)
-    dissolved_oxygen = st.number_input("Dissolved Oxygen", min_value=0.0, step=0.1)
-    saturation = st.number_input("DO (% Saturation)", min_value=0.0, step=0.1)
-    pH = st.number_input("pH", min_value=0.0, step=0.1)
-    salinity = st.number_input("Salinity (ppt)", min_value=0.0, step=0.1)
-    conductance = st.number_input("Specific Conductance", min_value=0.0, step=1.0)
-    turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, step=0.1)
+    avg_water_speed = st.number_input("Average Water Speed (m/s)", min_value=0.0, step=0.001, format="%.3f")
+    avg_water_direction = st.number_input("Average Water Direction (degrees)", min_value=0.0, max_value=360.0, step=0.1, format="%.3f")
+    chlorophyll = st.number_input("Chlorophyll", min_value=0.0, step=0.1, format="%.3f")
+    temperature = st.number_input("Temperature (°C)", min_value=0.0, step=0.1, format="%.3f")
+    dissolved_oxygen = st.number_input("Dissolved Oxygen", min_value=0.0, step=0.1, format="%.3f")
+    saturation = st.number_input("DO (% Saturation)", min_value=0.0, step=0.1, format="%.3f")
+    pH = st.number_input("pH", min_value=0.0, step=0.1, format="%.3f")
+    salinity = st.number_input("Salinity (ppt)", min_value=0.0, step=0.1, format="%.3f")
+    conductance = st.number_input("Specific Conductance", min_value=0.0, step=1.0, format="%.3f")
+    turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, step=0.1, format="%.3f")
 
     submitted = st.form_submit_button("Predict Cluster")
 
@@ -104,7 +103,6 @@ with st.form("input_form"):
 
 # === After Form Submitted ===
 if st.session_state.get('form_submitted', False):
-
     user_input = pd.DataFrame([st.session_state['user_input']])
     X_transformed = pipeline.transform(user_input)
     cluster = model.predict(X_transformed)[0]
@@ -131,19 +129,19 @@ if st.session_state.get('form_submitted', False):
     cluster1 = pca_df[pca_df['cluster'] == 1]
     cluster2 = pca_df[pca_df['cluster'] == 2]
 
-    # === Visualization Selection ===
     st.subheader("🖼️ Choose Visualization Type")
-    
     vis_option = st.radio(
         "Select a visualization:",
         ("1D (PC1 Distribution)", "2D (PC1 vs PC2)", "3D (PC1 vs PC2 vs PC3)", "Show All Visualizations")
     )
-    
-    # 1D Visualization
+
+    # === Visualization ===
+
+    # --- 1D Visualization ---
     if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
         st.subheader("📈 1D Visualization: PC1 Distribution")
         fig_1d = go.Figure()
-    
+
         fig_1d.add_trace(go.Scatter(
             x=cluster0.index,
             y=cluster0['PC1_3d'],
@@ -178,9 +176,10 @@ if st.session_state.get('form_submitted', False):
             name='Your Input',
             marker=dict(size=12, color="red", symbol="diamond"),
             text=["Your Input"],
-            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}",
+            hoverlabel=dict(bgcolor='red', font=dict(color='white'))
         ))
-    
+
         fig_1d.update_layout(
             title="PC1 Distribution Across Samples",
             xaxis_title="Sample Index",
@@ -188,12 +187,12 @@ if st.session_state.get('form_submitted', False):
             margin=dict(l=0, r=0, b=0, t=40)
         )
         st.plotly_chart(fig_1d, use_container_width=True)
-    
-    # 2D Visualization
+
+    # --- 2D Visualization ---
     if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
         st.subheader("📈 2D Visualization: PC1 vs PC2")
         fig_2d = go.Figure()
-    
+
         fig_2d.add_trace(go.Scatter(
             x=cluster0['PC1_3d'],
             y=cluster0['PC2_3d'],
@@ -228,9 +227,10 @@ if st.session_state.get('form_submitted', False):
             name='Your Input',
             marker=dict(size=12, color="red", symbol="diamond"),
             text=["Your Input"],
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}",
+            hoverlabel=dict(bgcolor='red', font=dict(color='white'))
         ))
-    
+
         fig_2d.update_layout(
             title="PC1 vs PC2 Scatter Plot",
             xaxis_title="PC1",
@@ -238,37 +238,43 @@ if st.session_state.get('form_submitted', False):
             margin=dict(l=0, r=0, b=0, t=40)
         )
         st.plotly_chart(fig_2d, use_container_width=True)
-    
-    # 3D Visualization
+
+    # --- 3D Visualization ---
     if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
         st.subheader("📈 3D Visualization: PC1 vs PC2 vs PC3")
-    
-        trace0 = go.Scatter3d(
-            x=cluster0['PC1_3d'], y=cluster0['PC2_3d'], z=cluster0['PC3_3d'],
+        fig_3d = go.Figure()
+
+        fig_3d.add_trace(go.Scatter3d(
+            x=cluster0['PC1_3d'],
+            y=cluster0['PC2_3d'],
+            z=cluster0['PC3_3d'],
             mode='markers',
             name='Cluster 0',
-            marker=dict(size=5, color='#66c2a5'),
+            marker=dict(color='#66c2a5', size=5),
             hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}",
             hoverlabel=dict(bgcolor='#66c2a5', font=dict(color='white'))
-        )
-        trace1 = go.Scatter3d(
-            x=cluster1['PC1_3d'], y=cluster1['PC2_3d'], z=cluster1['PC3_3d'],
+        ))
+        fig_3d.add_trace(go.Scatter3d(
+            x=cluster1['PC1_3d'],
+            y=cluster1['PC2_3d'],
+            z=cluster1['PC3_3d'],
             mode='markers',
             name='Cluster 1',
-            marker=dict(size=5, color='#fc8d62'),
+            marker=dict(color='#fc8d62', size=5),
             hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}",
             hoverlabel=dict(bgcolor='#fc8d62', font=dict(color='white'))
-        )
-        trace2 = go.Scatter3d(
-            x=cluster2['PC1_3d'], y=cluster2['PC2_3d'], z=cluster2['PC3_3d'],
+        ))
+        fig_3d.add_trace(go.Scatter3d(
+            x=cluster2['PC1_3d'],
+            y=cluster2['PC2_3d'],
+            z=cluster2['PC3_3d'],
             mode='markers',
             name='Cluster 2',
-            marker=dict(size=5, color='#8da0cb'),
+            marker=dict(color='#8da0cb', size=5),
             hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}",
             hoverlabel=dict(bgcolor='#8da0cb', font=dict(color='white'))
-        )
-    
-        user_point = go.Scatter3d(
+        ))
+        fig_3d.add_trace(go.Scatter3d(
             x=[X_transformed[0, 0]],
             y=[X_transformed[0, 1]],
             z=[X_transformed[0, 2]],
@@ -276,10 +282,10 @@ if st.session_state.get('form_submitted', False):
             name='Your Input',
             marker=dict(size=10, color='red', symbol='diamond'),
             text=["Your Input"],
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
-        )
-    
-        fig_3d = go.Figure(data=[trace0, trace1, trace2, user_point])
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}",
+            hoverlabel=dict(bgcolor='red', font=dict(color='white'))
+        ))
+
         fig_3d.update_layout(
             title="PC1 vs PC2 vs PC3 Scatter Plot",
             scene=dict(xaxis_title='PC1', yaxis_title='PC2', zaxis_title='PC3'),
@@ -287,4 +293,3 @@ if st.session_state.get('form_submitted', False):
             scene_camera_eye=dict(x=1.2, y=1.2, z=1.2)
         )
         st.plotly_chart(fig_3d, use_container_width=True)
-
