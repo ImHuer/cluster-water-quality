@@ -133,25 +133,25 @@ if st.session_state.get('form_submitted', False):
 
     # === Visualization Selection ===
     st.subheader("🖼️ Choose Visualization Type")
-
+    
     vis_option = st.radio(
         "Select a visualization:",
         ("1D (PC1 Distribution)", "2D (PC1 vs PC2)", "3D (PC1 vs PC2 vs PC3)", "Show All Visualizations")
     )
-
+    
+    # 1D Visualization
     if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
         st.subheader("📈 1D Visualization: PC1 Distribution")
-    
         fig_1d = go.Figure()
     
-        # Add each cluster manually
+        # Clusters
         fig_1d.add_trace(go.Scatter(
             x=cluster0.index,
             y=cluster0['PC1_3d'],
             mode='markers',
             name='Cluster 0',
             marker=dict(color='#66c2a5', size=5),
-            hoverinfo='text'
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
         ))
         fig_1d.add_trace(go.Scatter(
             x=cluster1.index,
@@ -159,7 +159,7 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 1',
             marker=dict(color='#fc8d62', size=5),
-            hoverinfo='text'
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
         ))
         fig_1d.add_trace(go.Scatter(
             x=cluster2.index,
@@ -167,10 +167,10 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 2',
             marker=dict(color='#8da0cb', size=5),
-            hoverinfo='text'
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
         ))
     
-        # Add user input manually
+        # User input
         fig_1d.add_trace(go.Scatter(
             x=[-1],
             y=[X_transformed[0, 0]],
@@ -178,7 +178,7 @@ if st.session_state.get('form_submitted', False):
             name='Your Input',
             marker=dict(size=12, color="red", symbol="diamond"),
             text=["Your Input"],
-            hoverinfo="text"
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
         ))
     
         fig_1d.update_layout(
@@ -187,23 +187,20 @@ if st.session_state.get('form_submitted', False):
             yaxis_title="PC1 Value",
             margin=dict(l=0, r=0, b=0, t=40)
         )
-    
         st.plotly_chart(fig_1d, use_container_width=True)
-
-
+    
+    # 2D Visualization
     if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
         st.subheader("📈 2D Visualization: PC1 vs PC2")
-    
         fig_2d = go.Figure()
     
-        # Add each cluster manually
         fig_2d.add_trace(go.Scatter(
             x=cluster0['PC1_3d'],
             y=cluster0['PC2_3d'],
             mode='markers',
             name='Cluster 0',
             marker=dict(color='#66c2a5', size=5),
-            hoverinfo='text'
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
         ))
         fig_2d.add_trace(go.Scatter(
             x=cluster1['PC1_3d'],
@@ -211,7 +208,7 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 1',
             marker=dict(color='#fc8d62', size=5),
-            hoverinfo='text'
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
         ))
         fig_2d.add_trace(go.Scatter(
             x=cluster2['PC1_3d'],
@@ -219,10 +216,9 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 2',
             marker=dict(color='#8da0cb', size=5),
-            hoverinfo='text'
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
         ))
     
-        # Add user input manually
         fig_2d.add_trace(go.Scatter(
             x=[X_transformed[0, 0]],
             y=[X_transformed[0, 1]],
@@ -230,7 +226,7 @@ if st.session_state.get('form_submitted', False):
             name='Your Input',
             marker=dict(size=12, color="red", symbol="diamond"),
             text=["Your Input"],
-            hoverinfo="text"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
         ))
     
         fig_2d.update_layout(
@@ -239,40 +235,34 @@ if st.session_state.get('form_submitted', False):
             yaxis_title="PC2",
             margin=dict(l=0, r=0, b=0, t=40)
         )
-    
         st.plotly_chart(fig_2d, use_container_width=True)
-
-
+    
+    # 3D Visualization
     if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
         st.subheader("📈 3D Visualization: PC1 vs PC2 vs PC3")
-
+    
         trace0 = go.Scatter3d(
             x=cluster0['PC1_3d'], y=cluster0['PC2_3d'], z=cluster0['PC3_3d'],
             mode='markers',
             name='Cluster 0',
-            marker=dict(size=5, color='#66c2a5'),  # Set2 Light Green
-            text=cluster0['hover_info'],
-            hoverinfo='text'
+            marker=dict(size=5, color='#66c2a5'),
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
         )
-        
         trace1 = go.Scatter3d(
             x=cluster1['PC1_3d'], y=cluster1['PC2_3d'], z=cluster1['PC3_3d'],
             mode='markers',
             name='Cluster 1',
-            marker=dict(size=5, color='#fc8d62'),  # Set2 Orange
-            text=cluster1['hover_info'],
-            hoverinfo='text'
+            marker=dict(size=5, color='#fc8d62'),
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
         )
-        
         trace2 = go.Scatter3d(
             x=cluster2['PC1_3d'], y=cluster2['PC2_3d'], z=cluster2['PC3_3d'],
             mode='markers',
             name='Cluster 2',
-            marker=dict(size=5, color='#8da0cb'),  # Set2 Light Purple
-            text=cluster2['hover_info'],
-            hoverinfo='text'
+            marker=dict(size=5, color='#8da0cb'),
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
         )
-
+    
         user_point = go.Scatter3d(
             x=[X_transformed[0, 0]],
             y=[X_transformed[0, 1]],
@@ -281,13 +271,15 @@ if st.session_state.get('form_submitted', False):
             name='Your Input',
             marker=dict(size=10, color='red', symbol='diamond'),
             text=["Your Input"],
-            hoverinfo='text'
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
         )
-
+    
         fig_3d = go.Figure(data=[trace0, trace1, trace2, user_point])
         fig_3d.update_layout(
+            title="PC1 vs PC2 vs PC3 Scatter Plot",
             scene=dict(xaxis_title='PC1', yaxis_title='PC2', zaxis_title='PC3'),
             margin=dict(l=0, r=0, b=0, t=40),
             scene_camera_eye=dict(x=1.2, y=1.2, z=1.2)
         )
         st.plotly_chart(fig_3d, use_container_width=True)
+
