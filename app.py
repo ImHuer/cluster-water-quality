@@ -148,7 +148,11 @@ if st.session_state.get('form_submitted', False):
             color=pca_df['cluster'].astype(str),
             labels={"color": "Cluster"},
             title="PC1 Distribution Across Samples",
-            color_discrete_sequence=px.colors.qualitative.Set2
+            color_discrete_map={
+                "0": "#66c2a5", 
+                "1": "#fc8d62", 
+                "2": "#8da0cb"
+            }
         )
         fig_1d.add_scatter(
             x=[-1],
@@ -170,7 +174,11 @@ if st.session_state.get('form_submitted', False):
             color=pca_df['cluster'].astype(str),
             labels={"color": "Cluster"},
             title="PC1 vs PC2 Scatter Plot",
-            color_discrete_sequence=px.colors.qualitative.Set2
+            color_discrete_map={
+                "0": "#66c2a5", 
+                "1": "#fc8d62", 
+                "2": "#8da0cb"
+            }
         )
         fig_2d.add_scatter(
             x=[X_transformed[0, 0]],
