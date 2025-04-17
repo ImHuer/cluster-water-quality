@@ -141,55 +141,107 @@ if st.session_state.get('form_submitted', False):
 
     if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
         st.subheader("📈 1D Visualization: PC1 Distribution")
-        fig_1d = px.scatter(
-            pca_df,
-            x=pca_df.index,
-            y="PC1_3d",
-            color=pca_df['cluster'].astype(str),
-            labels={"color": "Cluster"},
-            title="PC1 Distribution Across Samples",
-            color_discrete_map={
-                "0": "#66c2a5", 
-                "1": "#fc8d62", 
-                "2": "#8da0cb"
-            }
-        )
-        fig_1d.add_scatter(
+    
+        fig_1d = go.Figure()
+    
+        # Add each cluster manually
+        fig_1d.add_trace(go.Scatter(
+            x=cluster0.index,
+            y=cluster0['PC1_3d'],
+            mode='markers',
+            name='Cluster 0',
+            marker=dict(color='#66c2a5', size=5),
+            hoverinfo='text'
+        ))
+        fig_1d.add_trace(go.Scatter(
+            x=cluster1.index,
+            y=cluster1['PC1_3d'],
+            mode='markers',
+            name='Cluster 1',
+            marker=dict(color='#fc8d62', size=5),
+            hoverinfo='text'
+        ))
+        fig_1d.add_trace(go.Scatter(
+            x=cluster2.index,
+            y=cluster2['PC1_3d'],
+            mode='markers',
+            name='Cluster 2',
+            marker=dict(color='#8da0cb', size=5),
+            hoverinfo='text'
+        ))
+    
+        # Add user input manually
+        fig_1d.add_trace(go.Scatter(
             x=[-1],
             y=[X_transformed[0, 0]],
-            mode="markers+text",
-            marker=dict(size=10, color="red", symbol="diamond"),
-            name="Your Input",
+            mode='markers+text',
+            name='Your Input',
+            marker=dict(size=12, color="red", symbol="diamond"),
             text=["Your Input"],
             hoverinfo="text"
+        ))
+    
+        fig_1d.update_layout(
+            title="PC1 Distribution Across Samples",
+            xaxis_title="Sample Index",
+            yaxis_title="PC1 Value",
+            margin=dict(l=0, r=0, b=0, t=40)
         )
+    
         st.plotly_chart(fig_1d, use_container_width=True)
+
 
     if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
         st.subheader("📈 2D Visualization: PC1 vs PC2")
-        fig_2d = px.scatter(
-            pca_df,
-            x="PC1_3d",
-            y="PC2_3d",
-            color=pca_df['cluster'].astype(str),
-            labels={"color": "Cluster"},
-            title="PC1 vs PC2 Scatter Plot",
-            color_discrete_map={
-                "0": "#66c2a5", 
-                "1": "#fc8d62", 
-                "2": "#8da0cb"
-            }
-        )
-        fig_2d.add_scatter(
+    
+        fig_2d = go.Figure()
+    
+        # Add each cluster manually
+        fig_2d.add_trace(go.Scatter(
+            x=cluster0['PC1_3d'],
+            y=cluster0['PC2_3d'],
+            mode='markers',
+            name='Cluster 0',
+            marker=dict(color='#66c2a5', size=5),
+            hoverinfo='text'
+        ))
+        fig_2d.add_trace(go.Scatter(
+            x=cluster1['PC1_3d'],
+            y=cluster1['PC2_3d'],
+            mode='markers',
+            name='Cluster 1',
+            marker=dict(color='#fc8d62', size=5),
+            hoverinfo='text'
+        ))
+        fig_2d.add_trace(go.Scatter(
+            x=cluster2['PC1_3d'],
+            y=cluster2['PC2_3d'],
+            mode='markers',
+            name='Cluster 2',
+            marker=dict(color='#8da0cb', size=5),
+            hoverinfo='text'
+        ))
+    
+        # Add user input manually
+        fig_2d.add_trace(go.Scatter(
             x=[X_transformed[0, 0]],
             y=[X_transformed[0, 1]],
-            mode="markers+text",
+            mode='markers+text',
+            name='Your Input',
             marker=dict(size=12, color="red", symbol="diamond"),
-            name="Your Input",
             text=["Your Input"],
             hoverinfo="text"
+        ))
+    
+        fig_2d.update_layout(
+            title="PC1 vs PC2 Scatter Plot",
+            xaxis_title="PC1",
+            yaxis_title="PC2",
+            margin=dict(l=0, r=0, b=0, t=40)
         )
+    
         st.plotly_chart(fig_2d, use_container_width=True)
+
 
     if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
         st.subheader("📈 3D Visualization: PC1 vs PC2 vs PC3")
