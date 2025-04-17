@@ -88,8 +88,17 @@ with st.form("input_form"):
     submitted = st.form_submit_button("Predict Cluster")
 
     if submitted:
+        try:
+            timestamp = datetime(2024, 1, 1) + pd.to_timedelta(day_of_year - 1, unit='d')
+            timestamp = timestamp.replace(month=month, hour=hour)
+            timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            st.error(f"Error creating timestamp: {e}")
+            st.stop()
+            
         st.session_state['form_submitted'] = True
         st.session_state['user_input'] = {
+            'Timestamp': timestamp,
             'Average Water Speed': avg_water_speed,
             'Average Water Direction': avg_water_direction,
             'Chlorophyll': chlorophyll,
@@ -99,10 +108,7 @@ with st.form("input_form"):
             'pH': pH,
             'Salinity': salinity,
             'Specific Conductance': conductance,
-            'Turbidity': turbidity,
-            'Hour': hour,
-            'DayOfYear': day_of_year,
-            'Month': month,
+            'Turbidity': turbidity
         }
 
 # === After Form Submitted ===
