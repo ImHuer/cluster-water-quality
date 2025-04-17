@@ -70,7 +70,7 @@ st.markdown("Enter values below to predict the cluster group for water quality c
 
 # === Form Input ===
 with st.form("input_form"):
-    timestamp = st.text_input("Timestamp (YYYY-MM-DD HH:MM:SS)", value=str(datetime.now()))
+    
     avg_water_speed = st.number_input("Average Water Speed (m/s)", min_value=0.0, step=0.001, format="%.3f")
     avg_water_direction = st.number_input("Average Water Direction (degrees)", min_value=0.0, max_value=360.0, step=0.1, format="%.3f")
     chlorophyll = st.number_input("Chlorophyll", min_value=0.0, step=0.1, format="%.3f")
@@ -81,6 +81,9 @@ with st.form("input_form"):
     salinity = st.number_input("Salinity (ppt)", min_value=0.0, step=0.1, format="%.3f")
     conductance = st.number_input("Specific Conductance", min_value=0.0, step=1.0, format="%.3f")
     turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, step=0.1, format="%.3f")
+    month = st.selectbox("Month", list(range(1, 13)))
+    day_of_year = st.selectbox("Day of Year", list(range(1, 367)))
+    hour = st.selectbox("Hour", list(range(0, 24)))
 
     submitted = st.form_submit_button("Predict Cluster")
 
@@ -98,7 +101,10 @@ with st.form("input_form"):
             'pH': pH,
             'Salinity': salinity,
             'Specific Conductance': conductance,
-            'Turbidity': turbidity
+            'Turbidity': turbidity,
+            'Hour': hour,
+            'DayOfYear': day_of_year,
+            'Month': month,
         }
 
 # === After Form Submitted ===
