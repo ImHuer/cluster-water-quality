@@ -7,6 +7,13 @@ import plotly.express as px
 import plotly.graph_objs as go
 from sklearn.base import BaseEstimator, TransformerMixin
 
+st.set_page_config(
+    page_title="Water Quality Cluster Predictor",
+    page_icon="🌊",
+    layout="wide",  # <--- VERY IMPORTANT
+    initial_sidebar_state="collapsed"
+)
+
 # === Custom Transformers ===
 class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
     def __init__(self, time_column='Timestamp'):
