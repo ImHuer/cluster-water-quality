@@ -123,6 +123,88 @@ if submitted:
         for i, p in enumerate(probs):
             st.write(f"Cluster {i}: {p:.2%}")
 
+import plotly.graph_objs as go
+import pandas as pd
+
+st.subheader("🧩 3D Visualization of Clusters (PCA Reduced)")
+
+# Load PCA + cluster data
+try:
+    pca_df = pd.read_csv('pca_with_clusters.csv')
+    st.write("✅ pca_df sample:")
+    st.dataframe(pca_df.head())
+    st.write(f"pca_df shape: {pca_df.shape}")
+except Exception as e:
+    st.error(f"❌ Error loading PCA data: {e}")
+    st.stop()
+
+if pca_df.empty:
+    st.warning("⚠️ PCA DataFrame is empty. Cannot plot clusters.")
+else:
+    # Split clusters
+    cluster0 = pca_df[pca_df['cluster'] == 0]
+    cluster1 = pca_df[pca_df['cluster'] == 1]
+    cluster2 = pca_df[pca_df['cluster'] == 2]
+
+    # Create cluster traces
+    trace0 = go.Scatter3d(
+        x=cluster0['PC1_3d'], y=cluster0['PC2_3d'], z=cluster0['PC3_3d'],
+        mode='markers',
+        name='Cluster 0',
+        marker=dict(size=5, color='rgba(255, 128, 255, 0.8)'),
+        text=cluster0['hover_info'],
+        hoverinfo='text'
+    )
+
+    trace1 = go.Scatter3d(
+        x=cluster1['PC1_3d'], y=cluster1['PC2_3d'], z=cluster1['PC3_3d'],
+        mode='markers',
+        name='Cluster 1',
+        marker=dict(size=5, color='rgba(255, 128, 2, 0.8)'),
+        text=cluster1['hover_info'],
+        hoverinfo='text'
+    )
+
+    trace2 = go.Scatter3d(
+        x=cluster2['PC1_3d'], y=cluster2['PC2_3d'], z=cluster2['PC3_3d'],
+        mode='markers',
+        name='Cluster 2',
+        marker=dict(size=5, color='rgba(0, 255, 200, 0.8)'),
+        text=cluster2['hover_info'],
+        hoverinfo='text'
+    )
+
+    # ✅ Now create USER trace
+    # Your X_transformed already passed through pipeline and PCA
+    user_point = go.Scatter3d(
+        x=[X_transformed[0, 0]],  # PC1 coordinate
+        y=[X_transformed[0, 1]],  # PC2 coordinate
+        z=[X_transformed[0, 2]],  # PC3 coordinate
+        mode='markers+text',
+        name='User Input',
+        marker=dict(size=10, color='red', symbol='diamond'),
+        text=["Your Input"],
+        hoverinfo='text'
+    )
+
+    data = [trace0, trace1, trace2, user_point]  # ← Add user_point to data!
+
+    layout = go.Layout(
+        title="Visualizing Clusters in 3D (Including Your Input!)",
+        scene=dict(
+            xaxis=dict(title='PC1'),
+            yaxis=dict(title='PC2'),
+            zaxis=dict(title='PC3')
+        ),
+        margin=dict(l=0, r=0, b=0, t=40),
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+
+    fig.update_layout(scene_camera_eye=dict(x=1.2, y=1.2, z=1.2))
+
+    st.plotly_chart(fig, use_container_width=True)
+    
     import plotly.graph_objs as go
     import pandas as pd
     
