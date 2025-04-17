@@ -98,6 +98,7 @@ with st.form("input_form"):
             
         st.session_state['form_submitted'] = True
         st.session_state['user_input'] = {
+            'Record number': 0,
             'Timestamp': timestamp,
             'Average Water Speed': avg_water_speed,
             'Average Water Direction': avg_water_direction,
