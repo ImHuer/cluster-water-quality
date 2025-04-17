@@ -116,15 +116,12 @@ if submitted:
             st.write(f"Cluster {i}: {p:.2%}")
 
     import plotly.graph_objs as go
-    
-    st.subheader("🧩 3D Visualization of Clusters (Including Your Input!)")
-    
+
+    st.subheader("📈 Cluster Visualization in 3D")
+
     # Load PCA + cluster data
     try:
         pca_df = pd.read_csv('pca_with_clusters.csv')
-        st.write("✅ pca_df sample:")
-        st.dataframe(pca_df.head())
-        st.write(f"pca_df shape: {pca_df.shape}")
     except Exception as e:
         st.error(f"❌ Error loading PCA data: {e}")
         st.stop()
