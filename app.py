@@ -144,14 +144,14 @@ if st.session_state.get('form_submitted', False):
         st.subheader("📈 1D Visualization: PC1 Distribution")
         fig_1d = go.Figure()
     
-        # Clusters
         fig_1d.add_trace(go.Scatter(
             x=cluster0.index,
             y=cluster0['PC1_3d'],
             mode='markers',
             name='Cluster 0',
             marker=dict(color='#66c2a5', size=5),
-            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}",
+            hoverlabel=dict(bgcolor='#66c2a5', font=dict(color='white'))
         ))
         fig_1d.add_trace(go.Scatter(
             x=cluster1.index,
@@ -159,7 +159,8 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 1',
             marker=dict(color='#fc8d62', size=5),
-            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}",
+            hoverlabel=dict(bgcolor='#fc8d62', font=dict(color='white'))
         ))
         fig_1d.add_trace(go.Scatter(
             x=cluster2.index,
@@ -167,10 +168,9 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 2',
             marker=dict(color='#8da0cb', size=5),
-            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}"
+            hovertemplate="Index: %{x}<br>PC1: %{y:.3f}",
+            hoverlabel=dict(bgcolor='#8da0cb', font=dict(color='white'))
         ))
-    
-        # User input
         fig_1d.add_trace(go.Scatter(
             x=[-1],
             y=[X_transformed[0, 0]],
@@ -200,7 +200,8 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 0',
             marker=dict(color='#66c2a5', size=5),
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}",
+            hoverlabel=dict(bgcolor='#66c2a5', font=dict(color='white'))
         ))
         fig_2d.add_trace(go.Scatter(
             x=cluster1['PC1_3d'],
@@ -208,7 +209,8 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 1',
             marker=dict(color='#fc8d62', size=5),
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}",
+            hoverlabel=dict(bgcolor='#fc8d62', font=dict(color='white'))
         ))
         fig_2d.add_trace(go.Scatter(
             x=cluster2['PC1_3d'],
@@ -216,9 +218,9 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 2',
             marker=dict(color='#8da0cb', size=5),
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}",
+            hoverlabel=dict(bgcolor='#8da0cb', font=dict(color='white'))
         ))
-    
         fig_2d.add_trace(go.Scatter(
             x=[X_transformed[0, 0]],
             y=[X_transformed[0, 1]],
@@ -246,21 +248,24 @@ if st.session_state.get('form_submitted', False):
             mode='markers',
             name='Cluster 0',
             marker=dict(size=5, color='#66c2a5'),
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}",
+            hoverlabel=dict(bgcolor='#66c2a5', font=dict(color='white'))
         )
         trace1 = go.Scatter3d(
             x=cluster1['PC1_3d'], y=cluster1['PC2_3d'], z=cluster1['PC3_3d'],
             mode='markers',
             name='Cluster 1',
             marker=dict(size=5, color='#fc8d62'),
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}",
+            hoverlabel=dict(bgcolor='#fc8d62', font=dict(color='white'))
         )
         trace2 = go.Scatter3d(
             x=cluster2['PC1_3d'], y=cluster2['PC2_3d'], z=cluster2['PC3_3d'],
             mode='markers',
             name='Cluster 2',
             marker=dict(size=5, color='#8da0cb'),
-            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}"
+            hovertemplate="PC1: %{x:.3f}<br>PC2: %{y:.3f}<br>PC3: %{z:.3f}",
+            hoverlabel=dict(bgcolor='#8da0cb', font=dict(color='white'))
         )
     
         user_point = go.Scatter3d(
