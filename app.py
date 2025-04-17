@@ -148,7 +148,7 @@ if st.session_state.get('form_submitted', False):
             color=pca_df['cluster'].astype(str),
             labels={"color": "Cluster"},
             title="PC1 Distribution Across Samples",
-            color_discrete_sequence=px.colors.qualitative.Set1
+            color_discrete_sequence=px.colors.qualitative.Set2
         )
         fig_1d.add_scatter(
             x=[-1],
@@ -188,22 +188,31 @@ if st.session_state.get('form_submitted', False):
 
         trace0 = go.Scatter3d(
             x=cluster0['PC1_3d'], y=cluster0['PC2_3d'], z=cluster0['PC3_3d'],
-            mode='markers', name='Cluster 0',
-            marker=dict(size=5, color='rgba(255, 128, 255, 0.8)'),
-            text=cluster0['hover_info'], hoverinfo='text'
+            mode='markers',
+            name='Cluster 0',
+            marker=dict(size=5, color='#66c2a5'),  # Set2 Light Green
+            text=cluster0['hover_info'],
+            hoverinfo='text'
         )
+        
         trace1 = go.Scatter3d(
             x=cluster1['PC1_3d'], y=cluster1['PC2_3d'], z=cluster1['PC3_3d'],
-            mode='markers', name='Cluster 1',
-            marker=dict(size=5, color='rgba(255, 128, 2, 0.8)'),
-            text=cluster1['hover_info'], hoverinfo='text'
+            mode='markers',
+            name='Cluster 1',
+            marker=dict(size=5, color='#fc8d62'),  # Set2 Orange
+            text=cluster1['hover_info'],
+            hoverinfo='text'
         )
+        
         trace2 = go.Scatter3d(
             x=cluster2['PC1_3d'], y=cluster2['PC2_3d'], z=cluster2['PC3_3d'],
-            mode='markers', name='Cluster 2',
-            marker=dict(size=5, color='rgba(0, 255, 200, 0.8)'),
-            text=cluster2['hover_info'], hoverinfo='text'
+            mode='markers',
+            name='Cluster 2',
+            marker=dict(size=5, color='#8da0cb'),  # Set2 Light Purple
+            text=cluster2['hover_info'],
+            hoverinfo='text'
         )
+
         user_point = go.Scatter3d(
             x=[X_transformed[0, 0]],
             y=[X_transformed[0, 1]],
