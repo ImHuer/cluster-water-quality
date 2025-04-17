@@ -116,7 +116,6 @@ if submitted:
             st.write(f"Cluster {i}: {p:.2%}")
 
     import plotly.graph_objs as go
-    import pandas as pd
     
     st.subheader("🧩 3D Visualization of Clusters (Including Your Input!)")
     
