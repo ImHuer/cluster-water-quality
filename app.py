@@ -72,6 +72,8 @@ st.markdown("Enter values below to predict the cluster group for water quality c
 # === User Input Form ===
 with st.form("input_form"):
     timestamp = st.text_input("Timestamp (YYYY-MM-DD HH:MM:SS)", value=str(datetime.now()))
+    avg_water_speed = st.number_input("Average Water Speed (m/s)", min_value=0.0, step=0.01)
+    avg_water_direction = st.number_input("Average Water Direction (degrees)", min_value=0.0, max_value=360.0, step=0.1)
     chlorophyll = st.number_input("Chlorophyll", min_value=0.0, step=0.1)
     temperature = st.number_input("Temperature (°C)", min_value=0.0, step=0.1)
     dissolved_oxygen = st.number_input("Dissolved Oxygen", min_value=0.0, step=0.1)
@@ -80,13 +82,16 @@ with st.form("input_form"):
     salinity = st.number_input("Salinity (ppt)", min_value=0.0, step=0.1)
     conductance = st.number_input("Specific Conductance", min_value=0.0, step=1.0)
     turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, step=0.1)
-
+    
     submitted = st.form_submit_button("Predict Cluster")
+
 
 if submitted:
     user_input = pd.DataFrame([{
         'Record number': 0,  # dummy value
         'Timestamp': timestamp,
+        'Average Water Speed': avg_water_speed
+        'Average Water Direction': avg_water_direction,
         'Chlorophyll': chlorophyll,
         'Temperature': temperature,
         'Dissolved Oxygen': dissolved_oxygen,
