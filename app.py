@@ -104,11 +104,12 @@ if submitted:
         for i, p in enumerate(probs):
             st.write(f"Cluster {i}: {p:.2%}")
 
-    # === Sidebar for Visualization Selection ===
-    st.sidebar.header("🔎 Select Visualization")
-    vis_option = st.sidebar.radio(
-        "Choose a visualization type:",
-        ("1D (PC1 Distribution)", "2D (PC1 vs PC2)", "3D (PC1 vs PC2 vs PC3)")
+    # === Visualization selection (only appear after submit) ===
+    st.subheader("🖼️ Choose Visualization Type")
+
+    vis_option = st.radio(
+        "Select a visualization:",
+        ("1D (PC1 Distribution)", "2D (PC1 vs PC2)", "3D (PC1 vs PC2 vs PC3)", "Show All Visualizations")
     )
 
     # === Load PCA cluster data
@@ -123,107 +124,107 @@ if submitted:
         cluster1 = pca_df[pca_df['cluster'] == 1]
         cluster2 = pca_df[pca_df['cluster'] == 2]
 
-        if vis_option == "1D (PC1 Distribution)":
-            st.subheader("📈 1D Visualization: PC1 Distribution")
-
-            fig_1d = px.scatter(
-                pca_df,
-                x=pca_df.index,
-                y="PC1_3d",
-                color=pca_df['cluster'].astype(str),
-                labels={"color": "Cluster"},
-                title="PC1 Distribution Across Samples",
-                color_discrete_sequence=px.colors.qualitative.Set1
-            )
-
-            fig_1d.add_scatter(
-                x=[-1],
-                y=[X_transformed[0, 0]],
-                mode="markers+text",
-                marker=dict(size=10, color="red", symbol="diamond"),
-                name="Your Input",
-                text=["Your Input"],
-                hoverinfo="text"
-            )
-
-            st.plotly_chart(fig_1d, use_container_width=True)
-
-        elif vis_option == "2D (PC1 vs PC2)":
-            st.subheader("📈 2D Visualization: PC1 vs PC2")
-
-            fig_2d = px.scatter(
-                pca_df,
-                x="PC1_3d",
-                y="PC2_3d",
-                color=pca_df['cluster'].astype(str),
-                labels={"color": "Cluster"},
-                title="PC1 vs PC2 Scatter Plot",
-                color_discrete_sequence=px.colors.qualitative.Set2
-            )
-
-            fig_2d.add_scatter(
-                x=[X_transformed[0, 0]],
-                y=[X_transformed[0, 1]],
-                mode="markers+text",
-                marker=dict(size=12, color="red", symbol="diamond"),
-                name="Your Input",
-                text=["Your Input"],
-                hoverinfo="text"
-            )
-
-            st.plotly_chart(fig_2d, use_container_width=True)
-
-        else:  # 3D
-            st.subheader("📈 3D Visualization: PC1 vs PC2 vs PC3")
-
-            trace0 = go.Scatter3d(
-                x=cluster0['PC1_3d'], y=cluster0['PC2_3d'], z=cluster0['PC3_3d'],
-                mode='markers', name='Cluster 0',
-                marker=dict(size=5, color='rgba(255, 128, 255, 0.8)'),
-                text=cluster0['hover_info'],
-                hoverinfo='text'
-            )
-
-            trace1 = go.Scatter3d(
-                x=cluster1['PC1_3d'], y=cluster1['PC2_3d'], z=cluster1['PC3_3d'],
-                mode='markers', name='Cluster 1',
-                marker=dict(size=5, color='rgba(255, 128, 2, 0.8)'),
-                text=cluster1['hover_info'],
-                hoverinfo='text'
-            )
-
-            trace2 = go.Scatter3d(
-                x=cluster2['PC1_3d'], y=cluster2['PC2_3d'], z=cluster2['PC3_3d'],
-                mode='markers', name='Cluster 2',
-                marker=dict(size=5, color='rgba(0, 255, 200, 0.8)'),
-                text=cluster2['hover_info'],
-                hoverinfo='text'
-            )
-
-            user_point = go.Scatter3d(
-                x=[X_transformed[0, 0]],
-                y=[X_transformed[0, 1]],
-                z=[X_transformed[0, 2]],
-                mode='markers+text',
-                name='Your Input',
-                marker=dict(size=10, color='red', symbol='diamond'),
-                text=["Your Input"],
-                hoverinfo='text'
-            )
-
-            data = [trace0, trace1, trace2, user_point]
-
-            layout = go.Layout(
-                title="Visualizing Clusters in 3D (Including Your Input!)",
-                scene=dict(
-                    xaxis=dict(title='PC1'),
-                    yaxis=dict(title='PC2'),
-                    zaxis=dict(title='PC3')
-                ),
-                margin=dict(l=0, r=0, b=0, t=40),
-            )
-
-            fig_3d = go.Figure(data=data, layout=layout)
-            fig_3d.update_layout(scene_camera_eye=dict(x=1.2, y=1.2, z=1.2))
-
-            st.plotly_chart(fig_3d, use_container_width=True)
+    if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
+        st.subheader("📈 1D Visualization: PC1 Distribution")
+    
+        fig_1d = px.scatter(
+            pca_df,
+            x=pca_df.index,
+            y="PC1_3d",
+            color=pca_df['cluster'].astype(str),
+            labels={"color": "Cluster"},
+            title="PC1 Distribution Across Samples",
+            color_discrete_sequence=px.colors.qualitative.Set1
+        )
+    
+        fig_1d.add_scatter(
+            x=[-1],
+            y=[X_transformed[0, 0]],
+            mode="markers+text",
+            marker=dict(size=10, color="red", symbol="diamond"),
+            name="Your Input",
+            text=["Your Input"],
+            hoverinfo="text"
+        )
+    
+        st.plotly_chart(fig_1d, use_container_width=True)
+    
+    if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
+        st.subheader("📈 2D Visualization: PC1 vs PC2")
+    
+        fig_2d = px.scatter(
+            pca_df,
+            x="PC1_3d",
+            y="PC2_3d",
+            color=pca_df['cluster'].astype(str),
+            labels={"color": "Cluster"},
+            title="PC1 vs PC2 Scatter Plot",
+            color_discrete_sequence=px.colors.qualitative.Set2
+        )
+    
+        fig_2d.add_scatter(
+            x=[X_transformed[0, 0]],
+            y=[X_transformed[0, 1]],
+            mode="markers+text",
+            marker=dict(size=12, color="red", symbol="diamond"),
+            name="Your Input",
+            text=["Your Input"],
+            hoverinfo="text"
+        )
+    
+        st.plotly_chart(fig_2d, use_container_width=True)
+    
+    if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
+        st.subheader("📈 3D Visualization: PC1 vs PC2 vs PC3")
+    
+        trace0 = go.Scatter3d(
+            x=cluster0['PC1_3d'], y=cluster0['PC2_3d'], z=cluster0['PC3_3d'],
+            mode='markers', name='Cluster 0',
+            marker=dict(size=5, color='rgba(255, 128, 255, 0.8)'),
+            text=cluster0['hover_info'],
+            hoverinfo='text'
+        )
+    
+        trace1 = go.Scatter3d(
+            x=cluster1['PC1_3d'], y=cluster1['PC2_3d'], z=cluster1['PC3_3d'],
+            mode='markers', name='Cluster 1',
+            marker=dict(size=5, color='rgba(255, 128, 2, 0.8)'),
+            text=cluster1['hover_info'],
+            hoverinfo='text'
+        )
+    
+        trace2 = go.Scatter3d(
+            x=cluster2['PC1_3d'], y=cluster2['PC2_3d'], z=cluster2['PC3_3d'],
+            mode='markers', name='Cluster 2',
+            marker=dict(size=5, color='rgba(0, 255, 200, 0.8)'),
+            text=cluster2['hover_info'],
+            hoverinfo='text'
+        )
+    
+        user_point = go.Scatter3d(
+            x=[X_transformed[0, 0]],
+            y=[X_transformed[0, 1]],
+            z=[X_transformed[0, 2]],
+            mode='markers+text',
+            name='Your Input',
+            marker=dict(size=10, color='red', symbol='diamond'),
+            text=["Your Input"],
+            hoverinfo='text'
+        )
+    
+        data = [trace0, trace1, trace2, user_point]
+    
+        layout = go.Layout(
+            title="Visualizing Clusters in 3D (Including Your Input!)",
+            scene=dict(
+                xaxis=dict(title='PC1'),
+                yaxis=dict(title='PC2'),
+                zaxis=dict(title='PC3')
+            ),
+            margin=dict(l=0, r=0, b=0, t=40),
+        )
+    
+        fig_3d = go.Figure(data=data, layout=layout)
+        fig_3d.update_layout(scene_camera_eye=dict(x=1.2, y=1.2, z=1.2))
+    
+        st.plotly_chart(fig_3d, use_container_width=True)
