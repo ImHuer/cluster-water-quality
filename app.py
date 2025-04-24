@@ -12,22 +12,10 @@ import plotly.io as pio
 import os
 
 def predict_fcm_cluster(X, fcm_model):
-    """
-    Predicts the cluster for each sample in X using the nearest FCM center.
-    """
-    centers = fcm_model["centers"]  # shape: (n_clusters, n_features)
-    predictions = []
-
-    # Ensure input is a NumPy array
-    X_array = X.to_numpy() if isinstance(X, pd.DataFrame) else X
-
-    for sample in X_array:
-        # Compute Euclidean distance to each center
-        distances = np.linalg.norm(centers - sample, axis=1)
-        cluster = np.argmin(distances)
-        predictions.append(cluster)
-
-    return predictions
+    centers = np.array(fcm_model["centers"])
+    X_arr = X.to_numpy() if isinstance(X, pd.DataFrame) else np.array(X)
+    return [int(np.argmin(np.linalg.norm(centers - sample, axis=1)))
+            for sample in X_arr]
 
 def generate_pdf(user_input, cluster_label, interpretation, image_paths=None):
     pdf = FPDF()
@@ -150,6 +138,7 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 # === Load Model and Pipeline ===
 pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_fcm_model.pkl")
+centers = np.array(model["centers"])
 
 # === Form Input ===
 with st.form("input_form"):
@@ -207,15 +196,9 @@ with st.form("input_form"):
 # === After Form Submitted ===
 if st.session_state.get('form_submitted', False):
     user_input = pd.DataFrame([st.session_state['user_input']])
-    X_transformed = pipeline.transform(user_input)
-
-    def predict_fcm_cluster(sample, fcm_model):
-        centers = fcm_model['centers']
-        sample = sample.reshape(-1)
-        distances = np.linalg.norm(centers - sample, axis=1)
-        return np.argmin(distances)
-
-    cluster = predict_fcm_cluster(X_transformed, model)[0]
+    X_transformed = pipeline.transform(user_input_df)
+    preds = predict_fcm_cluster(X_transformed, model)
+    cluster = preds[0]
 
     st.success(f"🔍 Predicted Cluster: Cluster {cluster}")
 
