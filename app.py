@@ -196,7 +196,7 @@ with st.form("input_form"):
 # === After Form Submitted ===
 if st.session_state.get('form_submitted', False):
     user_input = pd.DataFrame([st.session_state['user_input']])
-    X_transformed = pipeline.transform(user_input_df)
+    X_transformed = pipeline.transform(user_input)
     preds = predict_fcm_cluster(X_transformed, model)
     cluster = preds[0]
 
