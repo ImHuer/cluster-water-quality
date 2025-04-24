@@ -13,9 +13,19 @@ import os
 
 def predict_fcm_cluster(X, fcm_model):
     centers = np.array(fcm_model["centers"])
+    u = np.array(fcm_model["u"])                  # shape (c, n_samples)
     X_arr = X.to_numpy() if isinstance(X, pd.DataFrame) else np.array(X)
-    return [int(np.argmin(np.linalg.norm(centers - sample, axis=1)))
-            for sample in X_arr]
+    
+    labels = []
+    memberships = []
+    # For each sample, find nearest center and pull its membership
+    for i, sample in enumerate(X_arr):
+        dists = np.linalg.norm(centers - sample, axis=1)
+        lbl = int(np.argmin(dists))
+        labels.append(lbl)
+        memberships.append(u[lbl, i])            # fuzzy membership for that label
+    
+    return labels, memberships
 
 def generate_pdf(user_input, cluster_label, interpretation, image_paths=None):
     pdf = FPDF()
@@ -197,10 +207,14 @@ with st.form("input_form"):
 if st.session_state.get('form_submitted', False):
     user_input = pd.DataFrame([st.session_state['user_input']])
     X_transformed = pipeline.transform(user_input)
-    preds = predict_fcm_cluster(X_transformed, fcm_model)
-    cluster = preds[0]
+    
+    # get both labels and memberships
+    labels, mems = predict_fcm_cluster(X_transformed, fcm_model)
+    cluster = labels[0]
+    membership = mems[0]
 
     st.success(f"🔍 Predicted Cluster: Cluster {cluster}")
+    st.write(f"🟠 Membership strength: **{membership:.1%}**")
 
     #  === Interpret cluster meaning ===
     if cluster == 0:
