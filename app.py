@@ -101,66 +101,62 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_model.pkl")
 
-# === Streamlit App ===
-st.title("🌊 Water Quality Cluster Predictor")
-st.markdown("Enter values below to predict the cluster group for water quality conditions.")
+# === Sidebar Input Header ===
+st.sidebar.image("https://i.imgur.com/8wLkHeF.png", width=200)  # Replace with your logo or remove if not needed
+st.sidebar.title("🌊 Water Cluster Input Panel")
+st.sidebar.markdown("Use the controls below to input water quality data.")
 
-# === Form Input ===
-with st.form("input_form"):
-    tab1, tab2 = st.tabs(["💧 Water Quality Inputs", "🕒 Date & Time Inputs"])
+# === Sidebar User Input ===
+st.sidebar.markdown("## 📋 Enter Water Parameters")
+st.sidebar.markdown("Use the controls below to input water quality data.")
 
-    with tab1:
-        col1, col2 = st.columns(2)
-        with col1:
-            avg_water_speed = st.slider("🌊 Average Water Speed (m/s)", 0.0, 3.0, 0.5, 0.01)
-            avg_water_direction = st.slider("🧭 Average Water Direction (°)", 0.0, 360.0, 180.0)
-            chlorophyll = st.slider("🟢 Chlorophyll (µg/L)", 0.0, 50.0, 5.0)
-            temperature = st.slider("🌡️ Temperature (°C)", 0.0, 40.0, 25.0)
-            dissolved_oxygen = st.slider("💨 Dissolved Oxygen (mg/L)", 0.0, 14.0, 7.0)
+# Water quality sliders
+avg_water_speed = st.sidebar.slider("🌊 Average Water Speed (m/s)", 0.0, 3.0, 0.5, 0.01)
+avg_water_direction = st.sidebar.slider("🧭 Average Water Direction (°)", 0.0, 360.0, 180.0)
+chlorophyll = st.sidebar.slider("🟢 Chlorophyll (µg/L)", 0.0, 50.0, 5.0)
+temperature = st.sidebar.slider("🌡️ Temperature (°C)", 0.0, 40.0, 25.0)
+dissolved_oxygen = st.sidebar.slider("💨 Dissolved Oxygen (mg/L)", 0.0, 14.0, 7.0)
+saturation = st.sidebar.slider("💧 DO (% Saturation)", 0.0, 200.0, 100.0)
+pH = st.sidebar.slider("⚗️ pH Level", 4.0, 10.0, 7.0)
+salinity = st.sidebar.slider("🌊 Salinity (ppt)", 0.0, 40.0, 10.0)
+conductance = st.sidebar.slider("⚡ Specific Conductance (µS/cm)", 0.0, 10000.0, 500.0)
+turbidity = st.sidebar.slider("🌫️ Turbidity (NTU)", 0.0, 100.0, 5.0)
 
-        with col2:
-            saturation = st.slider("💧 DO (% Saturation)", 0.0, 200.0, 100.0)
-            pH = st.slider("⚗️ pH Level", 4.0, 10.0, 7.0)
-            salinity = st.slider("🌊 Salinity (ppt)", 0.0, 40.0, 10.0)
-            conductance = st.slider("⚡ Specific Conductance (µS/cm)", 0.0, 10000.0, 500.0)
-            turbidity = st.slider("🌫️ Turbidity (NTU)", 0.0, 100.0, 5.0)
+# Time controls
+st.sidebar.markdown("## 🕒 Date & Time Info")
+month = st.sidebar.selectbox("📅 Month", list(range(1, 13)))
+day_of_year = st.sidebar.selectbox("📆 Day of Year", list(range(1, 367)))
+hour = st.sidebar.selectbox("⏰ Hour", list(range(0, 24)))
 
-    with tab2:
-        st.markdown("### 📅 Select Timestamp")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            month = st.selectbox("Month", list(range(1, 13)))
-        with col2:
-            day_of_year = st.selectbox("Day of Year", list(range(1, 367)))
-        with col3:
-            hour = st.selectbox("Hour", list(range(0, 24)))
+# Predict button
+submitted = st.sidebar.button("🚀 Predict Cluster")
 
-    submitted = st.form_submit_button("🚀 Predict Cluster")
+# Process and store input after submission
+if submitted:
+    try:
+        timestamp = datetime(2024, 1, 1) + pd.to_timedelta(day_of_year - 1, unit='d')
+        timestamp = timestamp.replace(month=month, hour=hour)
+        timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+    except Exception as e:
+        st.error(f"Error creating timestamp: {e}")
+        st.stop()
 
-    if submitted:
-        try:
-            timestamp = datetime(2024, 1, 1) + pd.to_timedelta(day_of_year - 1, unit='d')
-            timestamp = timestamp.replace(month=month, hour=hour)
-            timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception as e:
-            st.error(f"Error creating timestamp: {e}")
-            st.stop()
-        
-        st.session_state['form_submitted'] = True
-        st.session_state['user_input'] = {
-            'Record number': 0,
-            'Timestamp': timestamp,
-            'Average Water Speed': avg_water_speed,
-            'Average Water Direction': avg_water_direction,
-            'Chlorophyll': chlorophyll,
-            'Temperature': temperature,
-            'Dissolved Oxygen': dissolved_oxygen,
-            'Dissolved Oxygen (%Saturation)': saturation,
-            'pH': pH,
-            'Salinity': salinity,
-            'Specific Conductance': conductance,
-            'Turbidity': turbidity
-        }
+    st.session_state['form_submitted'] = True
+    st.session_state['user_input'] = {
+        'Record number': 0,
+        'Timestamp': timestamp,
+        'Average Water Speed': avg_water_speed,
+        'Average Water Direction': avg_water_direction,
+        'Chlorophyll': chlorophyll,
+        'Temperature': temperature,
+        'Dissolved Oxygen': dissolved_oxygen,
+        'Dissolved Oxygen (%Saturation)': saturation,
+        'pH': pH,
+        'Salinity': salinity,
+        'Specific Conductance': conductance,
+        'Turbidity': turbidity
+    }
+
 
 
 # === After Form Submitted ===
