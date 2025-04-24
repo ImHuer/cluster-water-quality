@@ -190,15 +190,16 @@ with st.form("input_form"):
 if st.session_state.get('form_submitted', False):
     user_input = pd.DataFrame([st.session_state['user_input']])
     X_transformed = pipeline.transform(user_input)
-    cluster = model.predict(X_transformed)[0]
+
+    def predict_fcm_cluster(sample, fcm_model):
+        centers = fcm_model['centers']
+        sample = sample.reshape(-1)
+        distances = np.linalg.norm(centers - sample, axis=1)
+        return np.argmin(distances)
+
+    cluster = predict_fcm_cluster(X_transformed, model)
 
     st.success(f"🔍 Predicted Cluster: Cluster {cluster}")
-
-    if hasattr(model, "predict_proba"):
-        probs = model.predict_proba(X_transformed)[0]
-        st.subheader("📊 Cluster Probabilities")
-        for i, p in enumerate(probs):
-            st.write(f"Cluster {i}: {p:.2%}")
 
     #  === Interpret cluster meaning ===
     if cluster == 0:
