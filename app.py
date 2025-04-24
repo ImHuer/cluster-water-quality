@@ -102,25 +102,20 @@ pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_model.pkl")
 
 # === Sidebar Input Header ===
-st.sidebar.image("https://i.imgur.com/8wLkHeF.png", width=200)  # Replace with your logo or remove if not needed
 st.sidebar.title("🌊 Water Cluster Input Panel")
-st.sidebar.markdown("Use the controls below to input water quality data.")
+st.sidebar.markdown("Please type in each parameter below.")
 
-# === Sidebar User Input ===
-st.sidebar.markdown("## 📋 Enter Water Parameters")
-st.sidebar.markdown("Use the controls below to input water quality data.")
-
-# Water quality sliders
-avg_water_speed = st.sidebar.slider("🌊 Average Water Speed (m/s)", 0.0, 3.0, 0.5, 0.01)
-avg_water_direction = st.sidebar.slider("🧭 Average Water Direction (°)", 0.0, 360.0, 180.0)
-chlorophyll = st.sidebar.slider("🟢 Chlorophyll (µg/L)", 0.0, 50.0, 5.0)
-temperature = st.sidebar.slider("🌡️ Temperature (°C)", 0.0, 40.0, 25.0)
-dissolved_oxygen = st.sidebar.slider("💨 Dissolved Oxygen (mg/L)", 0.0, 14.0, 7.0)
-saturation = st.sidebar.slider("💧 DO (% Saturation)", 0.0, 200.0, 100.0)
-pH = st.sidebar.slider("⚗️ pH Level", 4.0, 10.0, 7.0)
-salinity = st.sidebar.slider("🌊 Salinity (ppt)", 0.0, 40.0, 10.0)
-conductance = st.sidebar.slider("⚡ Specific Conductance (µS/cm)", 0.0, 10000.0, 500.0)
-turbidity = st.sidebar.slider("🌫️ Turbidity (NTU)", 0.0, 100.0, 5.0)
+# === Manual Entry Inputs ===
+avg_water_speed = st.sidebar.number_input("🌊 Average Water Speed (m/s)", min_value=0.0, format="%.3f")
+avg_water_direction = st.sidebar.number_input("🧭 Average Water Direction (°)", min_value=0.0, max_value=360.0, format="%.3f")
+chlorophyll = st.sidebar.number_input("🟢 Chlorophyll (µg/L)", min_value=0.0, format="%.3f")
+temperature = st.sidebar.number_input("🌡️ Temperature (°C)", min_value=0.0, format="%.3f")
+dissolved_oxygen = st.sidebar.number_input("💨 Dissolved Oxygen (mg/L)", min_value=0.0, format="%.3f")
+saturation = st.sidebar.number_input("💧 DO (% Saturation)", min_value=0.0, format="%.3f")
+pH = st.sidebar.number_input("⚗️ pH Level", min_value=0.0, format="%.3f")
+salinity = st.sidebar.number_input("🌊 Salinity (ppt)", min_value=0.0, format="%.3f")
+conductance = st.sidebar.number_input("⚡ Specific Conductance (µS/cm)", min_value=0.0, format="%.3f")
+turbidity = st.sidebar.number_input("🌫️ Turbidity (NTU)", min_value=0.0, format="%.3f")
 
 # Time controls
 st.sidebar.markdown("## 🕒 Date & Time Info")
