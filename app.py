@@ -42,6 +42,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# === Title Display ===
+if 'form_submitted' not in st.session_state or not st.session_state['form_submitted']:
+    st.markdown("""
+        <div style='text-align:center; padding-top:20px; padding-bottom:20px;'>
+            <h1 style='font-size: 60px; color:#1f77b4;'>🌊 Water Quality Cluster Predictor</h1>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("# 🌊 Water Quality Cluster Predictor")
+    
 st.markdown("""
     <style>
     .stSlider > div { padding-top: 10px; padding-bottom: 10px; }
