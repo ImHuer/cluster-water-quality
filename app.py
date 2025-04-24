@@ -194,6 +194,12 @@ if st.session_state.get('form_submitted', False):
 
     st.success(f"🔍 Predicted Cluster: Cluster {cluster}")
 
+    if hasattr(model, "predict_proba"):
+    probs = model.predict_proba(X_transformed)[0]
+    st.subheader("📊 Cluster Probabilities")
+    for i, p in enumerate(probs):
+        st.write(f"Cluster {i}: {p:.2%}")
+
     # Interpret cluster meaning
     if cluster == 0:
         interpretation = [
@@ -422,9 +428,3 @@ if st.session_state.get('form_submitted', False):
         file_name="cluster_prediction_report.pdf",
         mime="application/pdf"
     )
-
-    if hasattr(model, "predict_proba"):
-        probs = model.predict_proba(X_transformed)[0]
-        st.subheader("📊 Cluster Probabilities")
-        for i, p in enumerate(probs):
-            st.write(f"Cluster {i}: {p:.2%}")
