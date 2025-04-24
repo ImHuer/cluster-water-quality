@@ -1,3 +1,4 @@
+ml version 1 :
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -42,28 +43,26 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# === Title Display ===
-if 'form_submitted' not in st.session_state or not st.session_state['form_submitted']:
-    st.markdown("""
-        <div style='text-align:center; padding-top:20px; padding-bottom:20px;'>
-            <h1 style='font-size: 60px; color:#1f77b4;'>🌊 Water Quality Cluster Predictor</h1>
-        </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("# 🌊 Water Quality Cluster Predictor")
-    
 st.markdown("""
     <style>
-    .stSlider > div { padding-top: 10px; padding-bottom: 10px; }
-    .stSelectbox > div > div { height: 50px; font-size: 18px; }
-    .stForm button { font-size: 18px !important; height: 50px !important; }
+    .stNumberInput > div > input {
+        height: 50px;
+        font-size: 18px;
+    }
+    .stSelectbox > div > div {
+        height: 50px;
+        font-size: 18px;
+    }
+    .stForm button {
+        font-size: 18px !important;
+        height: 55px !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-
 # === Custom Transformers ===
 class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
-    def __init__(self, time_column='Timestamp'):
+    def _init_(self, time_column='Timestamp'):
         self.time_column = time_column
 
     def fit(self, X, y=None):
@@ -78,7 +77,7 @@ class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
         return df.drop(columns=[self.time_column])
 
 class DropColumns(BaseEstimator, TransformerMixin):
-    def __init__(self, columns_to_drop):
+    def _init_(self, columns_to_drop):
         self.columns_to_drop = columns_to_drop
 
     def fit(self, X, y=None):
@@ -88,7 +87,7 @@ class DropColumns(BaseEstimator, TransformerMixin):
         return X.drop(columns=self.columns_to_drop, errors='ignore')
 
 class OutlierRemover(BaseEstimator, TransformerMixin):
-    def __init__(self, threshold=3):
+    def _init_(self, threshold=3):
         self.threshold = threshold
 
     def fit(self, X, y=None):
@@ -111,58 +110,62 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_model.pkl")
 
-# === Sidebar Input Header ===
-st.sidebar.title("🌊 Water Cluster Input Panel")
-st.sidebar.markdown("Please type in each parameter below.")
+# === Streamlit App ===
+st.title("🌊 Water Quality Cluster Predictor")
+st.markdown("Enter values below to predict the cluster group for water quality conditions.")
 
-# === Manual Entry Inputs ===
-avg_water_speed = st.sidebar.number_input("🌊 Average Water Speed (m/s)", min_value=0.0, format="%.3f")
-avg_water_direction = st.sidebar.number_input("🧭 Average Water Direction (°)", min_value=0.0, max_value=360.0, format="%.3f")
-chlorophyll = st.sidebar.number_input("🟢 Chlorophyll (µg/L)", min_value=0.0, format="%.3f")
-temperature = st.sidebar.number_input("🌡️ Temperature (°C)", min_value=0.0, format="%.3f")
-dissolved_oxygen = st.sidebar.number_input("💨 Dissolved Oxygen (mg/L)", min_value=0.0, format="%.3f")
-saturation = st.sidebar.number_input("💧 DO (% Saturation)", min_value=0.0, format="%.3f")
-pH = st.sidebar.number_input("⚗️ pH Level", min_value=0.0, format="%.3f")
-salinity = st.sidebar.number_input("🌊 Salinity (ppt)", min_value=0.0, format="%.3f")
-conductance = st.sidebar.number_input("⚡ Specific Conductance (µS/cm)", min_value=0.0, format="%.3f")
-turbidity = st.sidebar.number_input("🌫️ Turbidity (NTU)", min_value=0.0, format="%.3f")
+# === Form Input ===
+with st.form("input_form"):
+    col1, col2 = st.columns([2, 2])  # Wider input fields
 
-# Time controls
-st.sidebar.markdown("## 🕒 Date & Time Info")
-month = st.sidebar.selectbox("📅 Month", list(range(1, 13)))
-day_of_year = st.sidebar.selectbox("📆 Day of Year", list(range(1, 367)))
-hour = st.sidebar.selectbox("⏰ Hour", list(range(0, 24)))
+    with col1:
+        avg_water_speed = st.number_input("Average Water Speed (m/s)", min_value=0.0, step=0.001, format="%.3f")
+        avg_water_direction = st.number_input("Average Water Direction (degrees)", min_value=0.0, max_value=360.0, step=0.1, format="%.3f")
+        chlorophyll = st.number_input("Chlorophyll", min_value=0.0, step=0.1, format="%.3f")
+        temperature = st.number_input("Temperature (°C)", min_value=0.0, step=0.1, format="%.3f")
+        dissolved_oxygen = st.number_input("Dissolved Oxygen", min_value=0.0, step=0.1, format="%.3f")
 
-# Predict button
-submitted = st.sidebar.button("🚀 Predict Cluster")
+    with col2:
+        saturation = st.number_input("DO (% Saturation)", min_value=0.0, step=0.1, format="%.3f")
+        pH = st.number_input("pH", min_value=0.0, step=0.1, format="%.3f")
+        salinity = st.number_input("Salinity (ppt)", min_value=0.0, step=0.1, format="%.3f")
+        conductance = st.number_input("Specific Conductance", min_value=0.0, step=1.0, format="%.3f")
+        turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, step=0.1, format="%.3f")
 
-# Process and store input after submission
-if submitted:
-    try:
-        timestamp = datetime(2024, 1, 1) + pd.to_timedelta(day_of_year - 1, unit='d')
-        timestamp = timestamp.replace(month=month, hour=hour)
-        timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
-    except Exception as e:
-        st.error(f"Error creating timestamp: {e}")
-        st.stop()
+    col3, col4, col5 = st.columns([1, 1, 1])
+    with col3:
+        month = st.selectbox("Month", list(range(1, 13)))
+    with col4:
+        day_of_year = st.selectbox("Day of Year", list(range(1, 367)))
+    with col5:
+        hour = st.selectbox("Hour", list(range(0, 24)))
 
-    st.session_state['form_submitted'] = True
-    st.session_state['user_input'] = {
-        'Record number': 0,
-        'Timestamp': timestamp,
-        'Average Water Speed': avg_water_speed,
-        'Average Water Direction': avg_water_direction,
-        'Chlorophyll': chlorophyll,
-        'Temperature': temperature,
-        'Dissolved Oxygen': dissolved_oxygen,
-        'Dissolved Oxygen (%Saturation)': saturation,
-        'pH': pH,
-        'Salinity': salinity,
-        'Specific Conductance': conductance,
-        'Turbidity': turbidity
-    }
+    submitted = st.form_submit_button("🚀 Predict Cluster")
 
-
+    if submitted:
+        try:
+            timestamp = datetime(2024, 1, 1) + pd.to_timedelta(day_of_year - 1, unit='d')
+            timestamp = timestamp.replace(month=month, hour=hour)
+            timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            st.error(f"Error creating timestamp: {e}")
+            st.stop()
+            
+        st.session_state['form_submitted'] = True
+        st.session_state['user_input'] = {
+            'Record number': 0,
+            'Timestamp': timestamp,
+            'Average Water Speed': avg_water_speed,
+            'Average Water Direction': avg_water_direction,
+            'Chlorophyll': chlorophyll,
+            'Temperature': temperature,
+            'Dissolved Oxygen': dissolved_oxygen,
+            'Dissolved Oxygen (%Saturation)': saturation,
+            'pH': pH,
+            'Salinity': salinity,
+            'Specific Conductance': conductance,
+            'Turbidity': turbidity
+        }
 
 # === After Form Submitted ===
 if st.session_state.get('form_submitted', False):
@@ -170,7 +173,7 @@ if st.session_state.get('form_submitted', False):
     X_transformed = pipeline.transform(user_input)
     cluster = model.predict(X_transformed)[0]
 
-    st.success(f"🔍 Predicted Cluster: *Cluster {cluster}*")
+    st.success(f"🔍 Predicted Cluster: Cluster {cluster}")
 
     # Interpret cluster meaning
     if cluster == 0:
