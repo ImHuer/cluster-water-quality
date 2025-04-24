@@ -8,6 +8,9 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from fpdf import FPDF
 import base64
 
+# === Page Config ===
+st.set_page_config(page_title="Water Quality Cluster Predictor", page_icon="🌊", layout="wide")
+
 # === Custom Styling ===
 st.markdown("""
     <style>
@@ -37,9 +40,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
-# === Page Config ===
-st.set_page_config(page_title="Water Quality Cluster Predictor", page_icon="🌊", layout="wide")
 
 # === PDF Generator ===
 def generate_pdf(user_input, cluster_label, interpretation):
