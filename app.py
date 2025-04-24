@@ -70,7 +70,6 @@ st.markdown("""
         font-size: 18px;
         color: #666;
     }
-    <style>
     .stForm > div div[data-testid="stMarkdownContainer"] p {
         display: none;
     }
