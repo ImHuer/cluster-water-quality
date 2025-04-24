@@ -8,6 +8,27 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 from fpdf import FPDF #pip install fpdf
 import base64
+import plotly.io as pio
+
+image_paths = []
+
+if vis_option == "1D (PC1 Distribution)":
+    pio.write_image(fig_1d, "chart_1d.png", format='png', width=800, height=500)
+    image_paths.append("chart_1d.png")
+
+elif vis_option == "2D (PC1 vs PC2)":
+    pio.write_image(fig_2d, "chart_2d.png", format='png', width=800, height=500)
+    image_paths.append("chart_2d.png")
+
+elif vis_option == "3D (PC1 vs PC2 vs PC3)":
+    pio.write_image(fig_3d, "chart_3d.png", format='png', width=800, height=500)
+    image_paths.append("chart_3d.png")
+
+elif vis_option == "Show All Visualizations":
+    pio.write_image(fig_1d, "chart_1d.png", format='png', width=800, height=500)
+    pio.write_image(fig_2d, "chart_2d.png", format='png', width=800, height=500)
+    pio.write_image(fig_3d, "chart_3d.png", format='png', width=800, height=500)
+    image_paths.extend(["chart_1d.png", "chart_2d.png", "chart_3d.png"])
 
 def generate_pdf(user_input, cluster_label, interpretation):
     pdf = FPDF()
@@ -209,7 +230,7 @@ if st.session_state.get('form_submitted', False):
     for line in interpretation:
         st.markdown(f" {line}")
 
-    pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation)
+    pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation, image_paths=image_paths)
     b64 = base64.b64encode(pdf_bytes).decode()
 
     st.download_button(
