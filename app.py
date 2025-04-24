@@ -127,13 +127,7 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_model.pkl")
 
-# === Reset ===
-if st.button("🔄 Reset App"):
-    st.session_state.clear()
-    st.experimental_rerun()
-
 # === Form Input ===
-# === Form Input (Main Page Layout) ===
 with st.form("input_form"):
     col1, col2 = st.columns([2, 2])  # Two equal columns
 
@@ -209,6 +203,11 @@ if st.session_state.get('form_submitted', False):
             "- Suggests a dry-season or stable flow period",
             "- Indicates less anthropogenic disturbance"
         ]
+
+    # Show on screen
+    st.markdown("### 🧪 Cluster Characteristics")
+    for line in interpretation:
+        st.markdown(f"- {line}")
 
     pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation)
     b64 = base64.b64encode(pdf_bytes).decode()
