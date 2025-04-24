@@ -70,6 +70,12 @@ st.markdown("""
         font-size: 18px;
         color: #666;
     }
+    </style>
+""", unsafe_allow_html=True)
+
+# === Add this to hide "Press Enter to submit form" text  ===
+st.markdown("""
+    <style>
     .stForm > div div[data-testid="stMarkdownContainer"] p {
         display: none;
     }
@@ -203,7 +209,7 @@ if st.session_state.get('form_submitted', False):
         for i, p in enumerate(probs):
             st.write(f"Cluster {i}: {p:.2%}")
 
-    # Interpret cluster meaning
+    #  === Interpret cluster meaning ===
     if cluster == 0:
         interpretation = [
             "Cluster 0: Disturbed Water Conditions",
@@ -219,7 +225,7 @@ if st.session_state.get('form_submitted', False):
             "- Indicates less anthropogenic disturbance"
         ]
 
-    # Show on screen
+    # === Show on screen ===
     st.markdown("### 🧪 Cluster Characteristics")
     for line in interpretation:
         st.markdown(f" {line}")
@@ -244,12 +250,12 @@ if st.session_state.get('form_submitted', False):
         ("1D (PC1 Distribution)", "2D (PC1 vs PC2)", "3D (PC1 vs PC2 vs PC3)", "Show All Visualizations")
     )
 
-    # Store selected image paths
+    # === Store selected image paths ===
     image_paths = []
 
     # === Visualization ===
 
-    # --- 1D Visualization ---
+    #  === 1D Visualization  ===
     if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
         st.subheader("📈 1D Visualization: PC1 Distribution")
         fig_1d = go.Figure()
@@ -300,12 +306,12 @@ if st.session_state.get('form_submitted', False):
         )
         st.plotly_chart(fig_1d, use_container_width=True)
         
-        # Save the image
+        # === Save the image ===
         img_1d_path = "chart_1d.png"
         pio.write_image(fig_1d, img_1d_path, format='png', width=800, height=500)
         image_paths.append(img_1d_path)
 
-    # --- 2D Visualization ---
+    #  === 2D Visualization  ===
     if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
         st.subheader("📈 2D Visualization: PC1 vs PC2")
         fig_2d = go.Figure()
@@ -356,12 +362,12 @@ if st.session_state.get('form_submitted', False):
         )
         st.plotly_chart(fig_2d, use_container_width=True)
         
-        # Save the image
+        #  ===Save the image ===
         img_2d_path = "chart_2d.png"
         pio.write_image(fig_2d, img_2d_path, format='png', width=800, height=500)
         image_paths.append(img_2d_path)
 
-    # --- 3D Visualization ---
+    #  === 3D Visualization  ===
     if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
         st.subheader("📈 3D Visualization: PC1 vs PC2 vs PC3")
         fig_3d = go.Figure()
@@ -416,12 +422,12 @@ if st.session_state.get('form_submitted', False):
         )
         st.plotly_chart(fig_3d, use_container_width=True)
         
-        # Save the image
+        # === Save the image ===
         img_3d_path = "chart_3d.png"
         pio.write_image(fig_3d, img_3d_path, format='png', width=800, height=500)
         image_paths.append(img_3d_path)
 
-    # Download As PDF
+    #  === Download As PDF ===
     pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation, image_paths=image_paths)
     b64 = base64.b64encode(pdf_bytes).decode()
 
