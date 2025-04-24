@@ -137,8 +137,8 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 
 # === Load Model and Pipeline ===
 pipeline = joblib.load("pipeline_inference.pkl")
-model = joblib.load("trained_fcm_model.pkl")
-centers = np.array(model["centers"])
+fcm_model = joblib.load("trained_fcm_model.pkl")
+centers = np.array(fcm_model["centers"])
 
 # === Form Input ===
 with st.form("input_form"):
@@ -197,7 +197,7 @@ with st.form("input_form"):
 if st.session_state.get('form_submitted', False):
     user_input = pd.DataFrame([st.session_state['user_input']])
     X_transformed = pipeline.transform(user_input)
-    preds = predict_fcm_cluster(X_transformed, model)
+    preds = predict_fcm_cluster(X_transformed, fcm_model)
     cluster = preds[0]
 
     st.success(f"🔍 Predicted Cluster: Cluster {cluster}")
