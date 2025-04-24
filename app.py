@@ -42,26 +42,44 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# === Animated Welcome Title and Subtitle ===
 st.markdown("""
     <style>
-    .stNumberInput > div > input {
-        height: 50px;
-        font-size: 18px;
+    .title-container {
+        text-align: center;
+        padding-top: 30px;
+        padding-bottom: 20px;
+        animation: fadein 1.5s;
     }
-    .stSelectbox > div > div {
-        height: 50px;
-        font-size: 18px;
+    @keyframes fadein {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-    .stForm button {
-        font-size: 18px !important;
-        height: 55px !important;
+    .title-container h1 {
+        font-size: 60px;
+        color: #1f77b4;
+        margin-bottom: 10px;
+    }
+    .subtitle {
+        font-size: 18px;
+        color: #666;
     }
     </style>
 """, unsafe_allow_html=True)
 
+if 'form_submitted' not in st.session_state or not st.session_state['form_submitted']:
+    st.markdown("""
+        <div class="title-container">
+            <h1>🌊 Water Quality Cluster Predictor</h1>
+            <div class="subtitle">Please enter water parameters below to get started.</div>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("# 🌊 Water Quality Cluster Predictor")
+
 # === Custom Transformers ===
 class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
-    def _init_(self, time_column='Timestamp'):
+    def __init__(self, time_column='Timestamp'):
         self.time_column = time_column
 
     def fit(self, X, y=None):
@@ -76,7 +94,7 @@ class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
         return df.drop(columns=[self.time_column])
 
 class DropColumns(BaseEstimator, TransformerMixin):
-    def _init_(self, columns_to_drop):
+    def __init__(self, columns_to_drop):
         self.columns_to_drop = columns_to_drop
 
     def fit(self, X, y=None):
@@ -86,7 +104,7 @@ class DropColumns(BaseEstimator, TransformerMixin):
         return X.drop(columns=self.columns_to_drop, errors='ignore')
 
 class OutlierRemover(BaseEstimator, TransformerMixin):
-    def _init_(self, threshold=3):
+    def __init__(self, threshold=3):
         self.threshold = threshold
 
     def fit(self, X, y=None):
@@ -109,35 +127,36 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_model.pkl")
 
-# === Streamlit App ===
-st.title("🌊 Water Quality Cluster Predictor")
-st.markdown("Enter values below to predict the cluster group for water quality conditions.")
+# === Reset ===
+if st.sidebar.button("🔄 Reset App"):
+    st.session_state.clear()
+    st.experimental_rerun()
 
 # === Form Input ===
 with st.form("input_form"):
     col1, col2 = st.columns([2, 2])  # Wider input fields
 
     with col1:
-        avg_water_speed = st.number_input("Average Water Speed (m/s)", min_value=0.0, step=0.001, format="%.3f")
-        avg_water_direction = st.number_input("Average Water Direction (degrees)", min_value=0.0, max_value=360.0, step=0.1, format="%.3f")
-        chlorophyll = st.number_input("Chlorophyll", min_value=0.0, step=0.1, format="%.3f")
-        temperature = st.number_input("Temperature (°C)", min_value=0.0, step=0.1, format="%.3f")
-        dissolved_oxygen = st.number_input("Dissolved Oxygen", min_value=0.0, step=0.1, format="%.3f")
+        avg_water_speed = st.sidebar.number_input("🌊 Average Water Speed (m/s)", min_value=0.0, format="%.3f")
+        avg_water_direction = st.sidebar.number_input("🧭 Average Water Direction (°)", min_value=0.0, max_value=360.0, format="%.3f")
+        chlorophyll = st.sidebar.number_input("🟢 Chlorophyll (µg/L)", min_value=0.0, format="%.3f")
+        temperature = st.sidebar.number_input("🌡️ Temperature (°C)", min_value=0.0, format="%.3f")
+        dissolved_oxygen = st.sidebar.number_input("💨 Dissolved Oxygen (mg/L)", min_value=0.0, format="%.3f")
 
     with col2:
-        saturation = st.number_input("DO (% Saturation)", min_value=0.0, step=0.1, format="%.3f")
-        pH = st.number_input("pH", min_value=0.0, step=0.1, format="%.3f")
-        salinity = st.number_input("Salinity (ppt)", min_value=0.0, step=0.1, format="%.3f")
-        conductance = st.number_input("Specific Conductance", min_value=0.0, step=1.0, format="%.3f")
-        turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, step=0.1, format="%.3f")
+        saturation = st.sidebar.number_input("💧 DO (% Saturation)", min_value=0.0, format="%.3f")
+        pH = st.sidebar.number_input("⚗️ pH Level", min_value=0.0, format="%.3f")
+        salinity = st.sidebar.number_input("🌊 Salinity (ppt)", min_value=0.0, format="%.3f")
+        conductance = st.sidebar.number_input("⚡ Specific Conductance (µS/cm)", min_value=0.0, format="%.3f")
+        turbidity = st.sidebar.number_input("🌫️ Turbidity (NTU)", min_value=0.0, format="%.3f")
 
     col3, col4, col5 = st.columns([1, 1, 1])
     with col3:
-        month = st.selectbox("Month", list(range(1, 13)))
+        month = st.selectbox("📅 Month (1-12)", list(range(1, 13)))
     with col4:
-        day_of_year = st.selectbox("Day of Year", list(range(1, 367)))
+        day_of_year = st.selectbox("📆 Day of Year (1-366)", list(range(1, 367)))
     with col5:
-        hour = st.selectbox("Hour", list(range(0, 24)))
+        hour = st.selectbox("⏰ Hour (0-23)", list(range(0, 24)))
 
     submitted = st.form_submit_button("🚀 Predict Cluster")
 
