@@ -207,7 +207,7 @@ if st.session_state.get('form_submitted', False):
     # Show on screen
     st.markdown("### 🧪 Cluster Characteristics")
     for line in interpretation:
-        st.markdown(f"- {line}")
+        st.markdown(f" {line}")
 
     pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation)
     b64 = base64.b64encode(pdf_bytes).decode()
