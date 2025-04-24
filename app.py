@@ -131,7 +131,7 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 
 # === Load Model and Pipeline ===
 pipeline = joblib.load("pipeline_inference.pkl")
-model = joblib.load("trained_model.pkl")
+model = joblib.load("trained_fcm_model.pkl")
 
 # === Form Input ===
 with st.form("input_form"):
