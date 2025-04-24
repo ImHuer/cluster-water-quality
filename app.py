@@ -133,22 +133,23 @@ if st.sidebar.button("🔄 Reset App"):
     st.experimental_rerun()
 
 # === Form Input ===
+# === Form Input (Main Page Layout) ===
 with st.form("input_form"):
-    col1, col2 = st.columns([2, 2])  # Wider input fields
+    col1, col2 = st.columns([2, 2])  # Two equal columns
 
     with col1:
-        avg_water_speed = st.sidebar.number_input("🌊 Average Water Speed (m/s)", min_value=0.0, format="%.3f")
-        avg_water_direction = st.sidebar.number_input("🧭 Average Water Direction (°)", min_value=0.0, max_value=360.0, format="%.3f")
-        chlorophyll = st.sidebar.number_input("🟢 Chlorophyll (µg/L)", min_value=0.0, format="%.3f")
-        temperature = st.sidebar.number_input("🌡️ Temperature (°C)", min_value=0.0, format="%.3f")
-        dissolved_oxygen = st.sidebar.number_input("💨 Dissolved Oxygen (mg/L)", min_value=0.0, format="%.3f")
+        avg_water_speed = st.number_input("🌊 Average Water Speed (m/s)", min_value=0.0, format="%.3f")
+        avg_water_direction = st.number_input("🧭 Average Water Direction (°)", min_value=0.0, max_value=360.0, format="%.3f")
+        chlorophyll = st.number_input("🟢 Chlorophyll (µg/L)", min_value=0.0, format="%.3f")
+        temperature = st.number_input("🌡️ Temperature (°C)", min_value=0.0, format="%.3f")
+        dissolved_oxygen = st.number_input("💨 Dissolved Oxygen (mg/L)", min_value=0.0, format="%.3f")
 
     with col2:
-        saturation = st.sidebar.number_input("💧 DO (% Saturation)", min_value=0.0, format="%.3f")
-        pH = st.sidebar.number_input("⚗️ pH Level", min_value=0.0, format="%.3f")
-        salinity = st.sidebar.number_input("🌊 Salinity (ppt)", min_value=0.0, format="%.3f")
-        conductance = st.sidebar.number_input("⚡ Specific Conductance (µS/cm)", min_value=0.0, format="%.3f")
-        turbidity = st.sidebar.number_input("🌫️ Turbidity (NTU)", min_value=0.0, format="%.3f")
+        saturation = st.number_input("💧 DO (% Saturation)", min_value=0.0, format="%.3f")
+        pH = st.number_input("⚗️ pH Level", min_value=0.0, format="%.3f")
+        salinity = st.number_input("🌊 Salinity (ppt)", min_value=0.0, format="%.3f")
+        conductance = st.number_input("⚡ Specific Conductance (µS/cm)", min_value=0.0, format="%.3f")
+        turbidity = st.number_input("🌫️ Turbidity (NTU)", min_value=0.0, format="%.3f")
 
     col3, col4, col5 = st.columns([1, 1, 1])
     with col3:
