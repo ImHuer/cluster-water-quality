@@ -39,45 +39,6 @@ def generate_pdf(user_input, cluster_label, interpretation, image_paths=None):
 
     return pdf.output(dest='S').encode('latin-1')
 
-# Store selected image paths
-image_paths = []
-
-import os
-
-image_paths = []
-
-# 1D Visualization
-if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
-    ...
-    st.plotly_chart(fig_1d, use_container_width=True)
-    img_1d_path = "chart_1d.png"
-    pio.write_image(fig_1d, img_1d_path, format='png', width=800, height=500)
-    image_paths.append(img_1d_path)
-
-# 2D Visualization
-if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
-    ...
-    st.plotly_chart(fig_2d, use_container_width=True)
-    img_2d_path = "chart_2d.png"
-    pio.write_image(fig_2d, img_2d_path, format='png', width=800, height=500)
-    image_paths.append(img_2d_path)
-
-# 3D Visualization
-if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
-    ...
-    st.plotly_chart(fig_3d, use_container_width=True)
-    img_3d_path = "chart_3d.png"
-    pio.write_image(fig_3d, img_3d_path, format='png', width=800, height=500)
-    image_paths.append(img_3d_path)
-
-
-st.download_button(
-    label="\ud83d\udcc4 Download PDF Report with Visuals",
-    data=pdf_bytes,
-    file_name="cluster_prediction_report_with_visuals.pdf",
-    mime="application/pdf"
-)
-
 # === Page Config ===
 st.set_page_config(
     page_title="Water Quality Cluster Predictor",
@@ -288,6 +249,37 @@ if st.session_state.get('form_submitted', False):
         "Select a visualization:",
         ("1D (PC1 Distribution)", "2D (PC1 vs PC2)", "3D (PC1 vs PC2 vs PC3)", "Show All Visualizations")
     )
+
+    # Store selected image paths
+    image_paths = []
+    
+    import os
+    
+    image_paths = []
+    
+    # 1D Visualization
+    if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
+        ...
+        st.plotly_chart(fig_1d, use_container_width=True)
+        img_1d_path = "chart_1d.png"
+        pio.write_image(fig_1d, img_1d_path, format='png', width=800, height=500)
+        image_paths.append(img_1d_path)
+    
+    # 2D Visualization
+    if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
+        ...
+        st.plotly_chart(fig_2d, use_container_width=True)
+        img_2d_path = "chart_2d.png"
+        pio.write_image(fig_2d, img_2d_path, format='png', width=800, height=500)
+        image_paths.append(img_2d_path)
+    
+    # 3D Visualization
+    if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
+        ...
+        st.plotly_chart(fig_3d, use_container_width=True)
+        img_3d_path = "chart_3d.png"
+        pio.write_image(fig_3d, img_3d_path, format='png', width=800, height=500)
+        image_paths.append(img_3d_path)
 
     # === Visualization ===
 
