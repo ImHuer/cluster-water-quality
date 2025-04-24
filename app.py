@@ -203,38 +203,18 @@ with st.form("input_form"):
             'Turbidity': turbidity
         }
 
-from skfuzzy import cmeans_predict
-
 # === After Form Submitted ===
 if st.session_state.get('form_submitted', False):
-    user_input_df = pd.DataFrame([st.session_state['user_input']])
-    X_transformed = pipeline.transform(user_input_df)
+    user_input = pd.DataFrame([st.session_state['user_input']])
+    X_transformed = pipeline.transform(user_input)
+    
+    # get both labels and memberships
+    labels, mems = predict_fcm_cluster(X_transformed, fcm_model)
+    cluster = labels[0]
+    membership = mems[0]
 
-    # --- 1) run cmeans_predict on your new sample ---
-    #    cmeans_predict wants features × samples
-    sample_T = X_transformed.T
-    centers = np.array(fcm_model["centers"])
-    m       = fcm_model["m"]
-    error   = fcm_model["error"]
-    maxiter = fcm_model["maxiter"]
-
-    u_new, u0, d, jm, p, fpc = cmeans_predict(
-        sample_T,
-        centers,
-        m=m,
-        error=error,
-        maxiter=maxiter,
-    )
-
-    # --- 2) get the hard label and its membership ---
-    labels     = np.argmax(u_new, axis=0)      # shape (n_samples,)
-    memberships= np.max(u_new, axis=0)         # shape (n_samples,)
-    cluster    = int(labels[0])
-    membership = float(memberships[0])
-
-    # --- 3) show them ---
     st.success(f"🔍 Predicted Cluster: Cluster {cluster}")
-    st.write(f"💡 Membership (fuzzy confidence): **{membership:.1%}**")
+    st.write(f"🟠 Membership strength: **{membership:.1%}**")
 
     #  === Interpret cluster meaning ===
     if cluster == 0:
