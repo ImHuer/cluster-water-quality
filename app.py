@@ -44,20 +44,12 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    .stNumberInput > div > input {
-        height: 50px;
-        font-size: 18px;
-    }
-    .stSelectbox > div > div {
-        height: 50px;
-        font-size: 18px;
-    }
-    .stForm button {
-        font-size: 18px !important;
-        height: 55px !important;
-    }
+    .stSlider > div { padding-top: 10px; padding-bottom: 10px; }
+    .stSelectbox > div > div { height: 50px; font-size: 18px; }
+    .stForm button { font-size: 18px !important; height: 50px !important; }
     </style>
 """, unsafe_allow_html=True)
+
 
 # === Custom Transformers ===
 class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
@@ -115,29 +107,33 @@ st.markdown("Enter values below to predict the cluster group for water quality c
 
 # === Form Input ===
 with st.form("input_form"):
-    col1, col2 = st.columns([2, 2])  # Wider input fields
+    tab1, tab2 = st.tabs(["💧 Water Quality Inputs", "🕒 Date & Time Inputs"])
 
-    with col1:
-        avg_water_speed = st.number_input("Average Water Speed (m/s)", min_value=0.0, step=0.001, format="%.3f")
-        avg_water_direction = st.number_input("Average Water Direction (degrees)", min_value=0.0, max_value=360.0, step=0.1, format="%.3f")
-        chlorophyll = st.number_input("Chlorophyll", min_value=0.0, step=0.1, format="%.3f")
-        temperature = st.number_input("Temperature (°C)", min_value=0.0, step=0.1, format="%.3f")
-        dissolved_oxygen = st.number_input("Dissolved Oxygen", min_value=0.0, step=0.1, format="%.3f")
+    with tab1:
+        col1, col2 = st.columns(2)
+        with col1:
+            avg_water_speed = st.slider("🌊 Average Water Speed (m/s)", 0.0, 3.0, 0.5, 0.01)
+            avg_water_direction = st.slider("🧭 Average Water Direction (°)", 0.0, 360.0, 180.0)
+            chlorophyll = st.slider("🟢 Chlorophyll (µg/L)", 0.0, 50.0, 5.0)
+            temperature = st.slider("🌡️ Temperature (°C)", 0.0, 40.0, 25.0)
+            dissolved_oxygen = st.slider("💨 Dissolved Oxygen (mg/L)", 0.0, 14.0, 7.0)
 
-    with col2:
-        saturation = st.number_input("DO (% Saturation)", min_value=0.0, step=0.1, format="%.3f")
-        pH = st.number_input("pH", min_value=0.0, step=0.1, format="%.3f")
-        salinity = st.number_input("Salinity (ppt)", min_value=0.0, step=0.1, format="%.3f")
-        conductance = st.number_input("Specific Conductance", min_value=0.0, step=1.0, format="%.3f")
-        turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, step=0.1, format="%.3f")
+        with col2:
+            saturation = st.slider("💧 DO (% Saturation)", 0.0, 200.0, 100.0)
+            pH = st.slider("⚗️ pH Level", 4.0, 10.0, 7.0)
+            salinity = st.slider("🌊 Salinity (ppt)", 0.0, 40.0, 10.0)
+            conductance = st.slider("⚡ Specific Conductance (µS/cm)", 0.0, 10000.0, 500.0)
+            turbidity = st.slider("🌫️ Turbidity (NTU)", 0.0, 100.0, 5.0)
 
-    col3, col4, col5 = st.columns([1, 1, 1])
-    with col3:
-        month = st.selectbox("Month", list(range(1, 13)))
-    with col4:
-        day_of_year = st.selectbox("Day of Year", list(range(1, 367)))
-    with col5:
-        hour = st.selectbox("Hour", list(range(0, 24)))
+    with tab2:
+        st.markdown("### 📅 Select Timestamp")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            month = st.selectbox("Month", list(range(1, 13)))
+        with col2:
+            day_of_year = st.selectbox("Day of Year", list(range(1, 367)))
+        with col3:
+            hour = st.selectbox("Hour", list(range(0, 24)))
 
     submitted = st.form_submit_button("🚀 Predict Cluster")
 
@@ -149,7 +145,7 @@ with st.form("input_form"):
         except Exception as e:
             st.error(f"Error creating timestamp: {e}")
             st.stop()
-            
+        
         st.session_state['form_submitted'] = True
         st.session_state['user_input'] = {
             'Record number': 0,
@@ -165,6 +161,7 @@ with st.form("input_form"):
             'Specific Conductance': conductance,
             'Turbidity': turbidity
         }
+
 
 # === After Form Submitted ===
 if st.session_state.get('form_submitted', False):
