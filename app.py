@@ -73,15 +73,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# === Add this to hide "Press Enter to submit form" text  ===
-st.markdown("""
-    <style>
-    .stForm > div div[data-testid="stMarkdownContainer"] p {
-        display: none;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
 if 'form_submitted' not in st.session_state or not st.session_state['form_submitted']:
     st.markdown("""
         <div class="title-container">
