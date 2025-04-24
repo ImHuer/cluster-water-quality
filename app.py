@@ -128,7 +128,7 @@ pipeline = joblib.load("pipeline_inference.pkl")
 model = joblib.load("trained_model.pkl")
 
 # === Reset ===
-if st.sidebar.button("🔄 Reset App"):
+if st.button("🔄 Reset App"):
     st.session_state.clear()
     st.experimental_rerun()
 
