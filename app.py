@@ -6,6 +6,34 @@ from datetime import datetime
 import plotly.graph_objs as go
 from sklearn.base import BaseEstimator, TransformerMixin
 
+from fpdf import FPDF #pip install fpdf
+import base64
+
+def generate_pdf(user_input, cluster_label, interpretation):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    pdf.cell(200, 10, txt="Water Quality Cluster Report", ln=True, align='C')
+    pdf.ln(10)
+
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(100, 10, "User Input Parameters:", ln=True)
+    pdf.set_font("Arial", size=11)
+
+    for key, value in user_input.items():
+        pdf.cell(200, 8, txt=f"{key}: {value}", ln=True)
+
+    pdf.ln(8)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(100, 10, f"Predicted Cluster: Cluster {cluster_label}", ln=True)
+    pdf.ln(4)
+    pdf.set_font("Arial", size=11)
+    for line in interpretation:
+        pdf.multi_cell(0, 8, line)
+
+    return pdf.output(dest='S').encode('latin-1')
+
 # === Page Config ===
 st.set_page_config(
     page_title="Water Quality Cluster Predictor",
@@ -16,7 +44,7 @@ st.set_page_config(
 
 # === Custom Transformers ===
 class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
-    def __init__(self, time_column='Timestamp'):
+    def _init_(self, time_column='Timestamp'):
         self.time_column = time_column
 
     def fit(self, X, y=None):
@@ -31,7 +59,7 @@ class TimeFeaturesAdder(BaseEstimator, TransformerMixin):
         return df.drop(columns=[self.time_column])
 
 class DropColumns(BaseEstimator, TransformerMixin):
-    def __init__(self, columns_to_drop):
+    def _init_(self, columns_to_drop):
         self.columns_to_drop = columns_to_drop
 
     def fit(self, X, y=None):
@@ -41,7 +69,7 @@ class DropColumns(BaseEstimator, TransformerMixin):
         return X.drop(columns=self.columns_to_drop, errors='ignore')
 
 class OutlierRemover(BaseEstimator, TransformerMixin):
-    def __init__(self, threshold=3):
+    def _init_(self, threshold=3):
         self.threshold = threshold
 
     def fit(self, X, y=None):
@@ -118,7 +146,33 @@ if st.session_state.get('form_submitted', False):
     X_transformed = pipeline.transform(user_input)
     cluster = model.predict(X_transformed)[0]
 
-    st.success(f"🔍 Predicted Cluster: **Cluster {cluster}**")
+    st.success(f"🔍 Predicted Cluster: *Cluster {cluster}*")
+
+    # Interpret cluster meaning
+    if cluster == 0:
+        interpretation = [
+            "Cluster 0: Disturbed Water Conditions",
+            "- High turbidity and lower salinity",
+            "- Often caused by storm runoff or estuarine disturbance",
+            "- Typically observed during wet-season periods"
+        ]
+    elif cluster == 1:
+        interpretation = [
+            "Cluster 1: Stable Marine-like Conditions",
+            "- Clearer water and higher salinity",
+            "- Suggests a dry-season or stable flow period",
+            "- Indicates less anthropogenic disturbance"
+        ]
+
+    pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation)
+    b64 = base64.b64encode(pdf_bytes).decode()
+
+    st.download_button(
+        label="📄 Download PDF Report",
+        data=pdf_bytes,
+        file_name="cluster_prediction_report.pdf",
+        mime="application/pdf"
+    )
 
     if hasattr(model, "predict_proba"):
         probs = model.predict_proba(X_transformed)[0]
@@ -130,7 +184,7 @@ if st.session_state.get('form_submitted', False):
     try:
         pca_df = pd.read_csv('pca_with_clusters.csv')
         if pca_df.empty:
-            st.error("⚠️ Loaded PCA dataset is empty. Cannot continue.")
+            st.error("⚠ Loaded PCA dataset is empty. Cannot continue.")
             st.stop()
     except Exception as e:
         st.error(f"❌ Error loading PCA data: {e}")
@@ -140,7 +194,7 @@ if st.session_state.get('form_submitted', False):
     cluster1 = pca_df[pca_df['cluster'] == 1]
     cluster2 = pca_df[pca_df['cluster'] == 2]
 
-    st.subheader("🖼️ Choose Visualization Type")
+    st.subheader("🖼 Choose Visualization Type")
     vis_option = st.radio(
         "Select a visualization:",
         ("1D (PC1 Distribution)", "2D (PC1 vs PC2)", "3D (PC1 vs PC2 vs PC3)", "Show All Visualizations")
