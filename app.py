@@ -215,22 +215,6 @@ if st.session_state.get('form_submitted', False):
     for line in interpretation:
         st.markdown(f" {line}")
 
-    pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation, image_paths=image_paths)
-    b64 = base64.b64encode(pdf_bytes).decode()
-
-    st.download_button(
-        label="📄 Download PDF Report",
-        data=pdf_bytes,
-        file_name="cluster_prediction_report.pdf",
-        mime="application/pdf"
-    )
-
-    if hasattr(model, "predict_proba"):
-        probs = model.predict_proba(X_transformed)[0]
-        st.subheader("📊 Cluster Probabilities")
-        for i, p in enumerate(probs):
-            st.write(f"Cluster {i}: {p:.2%}")
-
     # === Load PCA cluster data ===
     try:
         pca_df = pd.read_csv('pca_with_clusters.csv')
@@ -427,3 +411,20 @@ if st.session_state.get('form_submitted', False):
         img_3d_path = "chart_3d.png"
         pio.write_image(fig_3d, img_3d_path, format='png', width=800, height=500)
         image_paths.append(img_3d_path)
+
+    # Download As PDF
+    pdf_bytes = generate_pdf(st.session_state['user_input'], cluster, interpretation, image_paths=image_paths)
+    b64 = base64.b64encode(pdf_bytes).decode()
+
+    st.download_button(
+        label="📄 Download PDF Report",
+        data=pdf_bytes,
+        file_name="cluster_prediction_report.pdf",
+        mime="application/pdf"
+    )
+
+    if hasattr(model, "predict_proba"):
+        probs = model.predict_proba(X_transformed)[0]
+        st.subheader("📊 Cluster Probabilities")
+        for i, p in enumerate(probs):
+            st.write(f"Cluster {i}: {p:.2%}")
