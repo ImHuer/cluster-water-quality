@@ -10,38 +10,17 @@ from fpdf import FPDF #pip install fpdf
 import base64
 import plotly.io as pio
 
-image_paths = []
-
-if vis_option == "1D (PC1 Distribution)":
-    pio.write_image(fig_1d, "chart_1d.png", format='png', width=800, height=500)
-    image_paths.append("chart_1d.png")
-
-elif vis_option == "2D (PC1 vs PC2)":
-    pio.write_image(fig_2d, "chart_2d.png", format='png', width=800, height=500)
-    image_paths.append("chart_2d.png")
-
-elif vis_option == "3D (PC1 vs PC2 vs PC3)":
-    pio.write_image(fig_3d, "chart_3d.png", format='png', width=800, height=500)
-    image_paths.append("chart_3d.png")
-
-elif vis_option == "Show All Visualizations":
-    pio.write_image(fig_1d, "chart_1d.png", format='png', width=800, height=500)
-    pio.write_image(fig_2d, "chart_2d.png", format='png', width=800, height=500)
-    pio.write_image(fig_3d, "chart_3d.png", format='png', width=800, height=500)
-    image_paths.extend(["chart_1d.png", "chart_2d.png", "chart_3d.png"])
-
-def generate_pdf(user_input, cluster_label, interpretation):
+def generate_pdf(user_input, cluster_label, interpretation, image_paths=None):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    
+
     pdf.cell(200, 10, txt="Water Quality Cluster Report", ln=True, align='C')
     pdf.ln(10)
 
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(100, 10, "User Input Parameters:", ln=True)
     pdf.set_font("Arial", size=11)
-
     for key, value in user_input.items():
         pdf.cell(200, 8, txt=f"{key}: {value}", ln=True)
 
@@ -53,7 +32,51 @@ def generate_pdf(user_input, cluster_label, interpretation):
     for line in interpretation:
         pdf.multi_cell(0, 8, line)
 
+    if image_paths:
+        for img in image_paths:
+            pdf.add_page()
+            pdf.image(img, w=180)
+
     return pdf.output(dest='S').encode('latin-1')
+
+# Store selected image paths
+image_paths = []
+
+import os
+
+image_paths = []
+
+# 1D Visualization
+if vis_option == "1D (PC1 Distribution)" or vis_option == "Show All Visualizations":
+    ...
+    st.plotly_chart(fig_1d, use_container_width=True)
+    img_1d_path = "chart_1d.png"
+    pio.write_image(fig_1d, img_1d_path, format='png', width=800, height=500)
+    image_paths.append(img_1d_path)
+
+# 2D Visualization
+if vis_option == "2D (PC1 vs PC2)" or vis_option == "Show All Visualizations":
+    ...
+    st.plotly_chart(fig_2d, use_container_width=True)
+    img_2d_path = "chart_2d.png"
+    pio.write_image(fig_2d, img_2d_path, format='png', width=800, height=500)
+    image_paths.append(img_2d_path)
+
+# 3D Visualization
+if vis_option == "3D (PC1 vs PC2 vs PC3)" or vis_option == "Show All Visualizations":
+    ...
+    st.plotly_chart(fig_3d, use_container_width=True)
+    img_3d_path = "chart_3d.png"
+    pio.write_image(fig_3d, img_3d_path, format='png', width=800, height=500)
+    image_paths.append(img_3d_path)
+
+
+st.download_button(
+    label="\ud83d\udcc4 Download PDF Report with Visuals",
+    data=pdf_bytes,
+    file_name="cluster_prediction_report_with_visuals.pdf",
+    mime="application/pdf"
+)
 
 # === Page Config ===
 st.set_page_config(
